@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "vrp-algorithms"
+version = "0.1.0"
+description = "Algorithms to solve VRP problems"
+authors = ["Robert Kozak <you@example.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+tsplib95 = "^0.7.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
