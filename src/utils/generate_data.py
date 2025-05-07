@@ -34,23 +34,34 @@ class FileGenerator:
         """
         return f"vpr{cities}_{vehicles}_{instance_number}"
 
-    # @staticmethod
-    # def get_vehicles_number(cities: int) -> int:
-    #     """Calculates the number of vehicles based on the number of cities.
-    #
-    #     Args:
-    #         cities (int): Number of cities.
-    #
-    #     Returns:
-    #         int: Number of vehicles.
-    #     """
-    #     return max(1, cities // 20)
-
     @staticmethod
-    def get_vehicles_number(num_cities: int, min_clients_per_vehicle=20, max_clients_per_vehicle=30):
+    def get_vehicles_number(num_cities: int, min_clients_per_vehicle: int = 20,
+                            max_clients_per_vehicle: int = 30) -> int:
+        """Calculates the number of vehicles required based on the number of cities and clients per vehicle.
+
+        Args:
+            num_cities (int): Total number of cities.
+            min_clients_per_vehicle (int, optional): Minimum number of clients per vehicle. Defaults to 20.
+            max_clients_per_vehicle (int, optional): Maximum number of clients per vehicle. Defaults to 30.
+
+        Returns:
+            int: Calculated number of vehicles.
+        """
         clients = num_cities - 1
         clients_per_vehicle = random.randint(min_clients_per_vehicle, max_clients_per_vehicle)
         return max(2, round(clients / clients_per_vehicle))
+
+    @staticmethod
+    def get_deport_id(selected_rows: List[List[str]]) -> int:
+        """Selects a random depot ID from the selected rows.
+
+        Args:
+            selected_rows (List[List[str]]): List of selected rows, where each row is a list of strings.
+
+        Returns:
+            int: Depot ID selected randomly from the first column of the rows.
+        """
+        return int(random.choice(selected_rows)[0])
 
     def generate_parameters_json(
         self,
@@ -129,11 +140,6 @@ class FileGenerator:
         return rows, header
 
 
-    @staticmethod
-    def get_deport_id(selected_rows):
-        return int(random.choice(selected_rows)[0])
-
-
     def generate_single_file_pair(
         self,
         cities: int,
@@ -161,9 +167,13 @@ class FileGenerator:
         """Generates multiple problem instances as CSV and JSON files.
 
         Args:
-            output_folder_path (str): Path to the output folder.
-        """
+            output_folder_path (str): Path to the output folder where files will be saved.
+            datasets_sizes (List[int]): List of dataset sizes, representing the number of cities.
+            instances_per_size (int): Number of instances to generate for each dataset size.
 
+        Returns:
+            None
+        """
         for cities in datasets_sizes:
             for instance_number in range(1, instances_per_size):
                 vehicles = self.get_vehicles_number(cities)
@@ -172,16 +182,26 @@ class FileGenerator:
                 )
         logger.info("Finished generating files")
 
-    def generate_train_data(self, datasets_sizes: List[int] = range(101, 401, 50), instances_per_size: int = 10) -> None:
+    def generate_train_data(self, datasets_sizes: List[int] = range(101, 401, 50),
+                            instances_per_size: int = 10) -> None:
         """Generates training data files.
+
+        Args:
+            datasets_sizes (List[int], optional): List of dataset sizes for training data. Defaults to range(101, 401, 50).
+            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 10.
 
         Returns:
             None
         """
         self.generate_data(self.output_train_path, datasets_sizes, instances_per_size)
 
-    def generate_validate_data(self, datasets_sizes: List[int] = range(151, 401, 50), instances_per_size: int = 4) -> None:
+    def generate_validate_data(self, datasets_sizes: List[int] = range(151, 401, 50),
+                               instances_per_size: int = 4) -> None:
         """Generates validation data files.
+
+        Args:
+            datasets_sizes (List[int], optional): List of dataset sizes for validation data. Defaults to range(151, 401, 50).
+            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
 
         Returns:
             None
@@ -190,6 +210,10 @@ class FileGenerator:
 
     def generate_test_data(self, datasets_sizes: List[int] = range(201, 501, 100), instances_per_size: int = 4) -> None:
         """Generates test data files.
+
+        Args:
+            datasets_sizes (List[int], optional): List of dataset sizes for test data. Defaults to range(201, 501, 100).
+            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
 
         Returns:
             None
