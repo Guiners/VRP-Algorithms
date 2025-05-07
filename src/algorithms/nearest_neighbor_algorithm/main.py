@@ -55,15 +55,6 @@ class NearestNeighborVRP(VRPInstanceLoader):
         end_time = time.time()
         total_distance_in_km = total_distance_in_meters / 1000
         processing_time = end_time - start_time
-        data_to_save = {
-            "distance": round(total_distance_in_km, 2),
-            "processing_time": processing_time,
-            "cost": self.vehicle_info.count_cost(total_distance_in_km),
-        }
-        logger.info("Total distance: %s", data_to_save["distance"])
-        logger.info("Total processing time: %s", data_to_save["processing_time"])
-        logger.info("Cost of whole operation in $: %s", data_to_save["cost"])
-        with open(output_file_path, "w") as json_file:
-            json.dump(data_to_save, json_file, indent=4)
+        self.save_results_to_file(total_distance_in_km, processing_time, self.vehicle_info, output_file_path)
 
         return routes

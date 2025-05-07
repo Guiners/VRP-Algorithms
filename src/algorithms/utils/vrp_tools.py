@@ -59,6 +59,19 @@ class VRPInstanceLoader:
 
         return VRPData(cities=cities, depot=depot, vehicles=vehicles)
 
+    @staticmethod
+    def save_results_to_file(total_distance_in_km, processing_time, vehicle_info, output_file_path):
+        data_to_save = {
+            "distance": round(total_distance_in_km, 2),
+            "processing_time": processing_time,
+            "cost": vehicle_info.count_cost(total_distance_in_km),
+        }
+        logger.debug("Total distance: %s", data_to_save["distance"])
+        logger.debug("Total processing time: %s", data_to_save["processing_time"])
+        logger.debug("Cost of whole operation in $: %s", data_to_save["cost"])
+        with open(output_file_path, "w") as json_file:
+            json.dump(data_to_save, json_file, indent=4)
+
 
 # data = VRPInstanceLoader.load_dataset("../../../datasets/test/vpr201_7_3.csv", "../../../datasets/test/vpr201_7_3.json")
 #

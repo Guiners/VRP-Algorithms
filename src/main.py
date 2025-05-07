@@ -4,9 +4,13 @@ import re
 from src.algorithms.nearest_neighbor_algorithm.main import NearestNeighborVRP
 from src.algorithms.utils.vrp_tools import VehicleInfo
 from src.utils.constants import (
-    ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
     NN_ALGORITHM_NAME,
-    ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
+ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH,
+ABSOLUTE_OUTPUT_TEST_FOLDER_PATH,
     JSON
 )
 from src.utils.logger_config import logger
@@ -29,7 +33,21 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
 
 def run_nn_for_train():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+    iterate_files(ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
                   ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
 
+def run_nn_for_validate():
+    nn_algorithm = NearestNeighborVRP(vehicle_info)
+    iterate_files(ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+                  ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
+
+def run_nn_for_test():
+    nn_algorithm = NearestNeighborVRP(vehicle_info)
+    iterate_files(ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+                  ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
+
+
+
 run_nn_for_train()
+run_nn_for_validate()
+run_nn_for_test()
