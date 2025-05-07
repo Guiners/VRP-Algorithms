@@ -18,8 +18,6 @@ class FileGenerator:
         self.output_validate_path = "../../datasets/validate/{path}"
         self.output_test_path = "../../datasets/test/{path}"
         self.input_csv_path = "../../datasets/raw/cities_in_csv.csv"
-        # self.datasets_sizes = range(50, 1000, 50)
-        self.datasets_sizes = range(1,10)
         self.rows, self.header = self.get_info_from_csv()
 
     @staticmethod
@@ -124,10 +122,13 @@ class FileGenerator:
 
         return rows, header
 
-    def get_depot_id(self, selected_rows):
+
+    @staticmethod
+    def get_deport_id(selected_rows):
         return int(random.choice(selected_rows)[0])
 
-    def generate_sigle_file_pair(
+
+    def generate_single_file_pair(
         self,
         cities: int,
         vehicles: int,
@@ -147,50 +148,50 @@ class FileGenerator:
             self.header, selected_rows, output_path, vehicles, cities, instance_number
         )
         self.generate_parameters_json(
-            output_path, vehicles, cities, self.get_depot_id(selected_rows), instance_number
+            output_path, vehicles, cities, self.get_deport_id(selected_rows), instance_number
         )
 
-    def generate_data(self, output_folder_path: str) -> None:
+    def generate_data(self, output_folder_path: str, datasets_sizes: List[int], instances_per_size: int) -> None:
         """Generates multiple problem instances as CSV and JSON files.
 
         Args:
             output_folder_path (str): Path to the output folder.
         """
 
-        for cities in self.datasets_sizes:
-            for instance_number in range(1, 4):
+        for cities in datasets_sizes:
+            for instance_number in range(1, instances_per_size):
                 vehicles = self.get_vehicles_number(cities)
-                self.generate_sigle_file_pair(
+                self.generate_single_file_pair(
                     cities, vehicles, instance_number, output_folder_path
                 )
         logger.info("Finished generating files")
 
-    def generate_train_data(self) -> None:
+    def generate_train_data(self, datasets_sizes: List[int] = range(100, 400, 50), instances_per_size: int = 10) -> None:
         """Generates training data files.
 
         Returns:
             None
         """
-        self.generate_data(self.output_train_path)
+        self.generate_data(self.output_train_path, datasets_sizes, instances_per_size)
 
-    def generate_test_data(self) -> None:
-        """Generates test data files.
-
-        Returns:
-            None
-        """
-        self.generate_data(self.output_test_path)
-
-    def generate_validate_data(self) -> None:
+    def generate_validate_data(self, datasets_sizes: List[int] = range(150, 400, 50), instances_per_size: int = 4) -> None:
         """Generates validation data files.
 
         Returns:
             None
         """
-        self.generate_data(self.output_validate_path)
+        self.generate_data(self.output_validate_path, datasets_sizes, instances_per_size)
 
+    def generate_test_data(self, datasets_sizes: List[int] = range(200, 500, 100), instances_per_size: int = 4) -> None:
+        """Generates test data files.
+
+        Returns:
+            None
+        """
+        self.generate_data(self.output_test_path, datasets_sizes, instances_per_size)
 
 File_generator = FileGenerator()
 File_generator.generate_train_data()
+File_generator.generate_test_data()
+File_generator.generate_validate_data()
 
-print("abc")
