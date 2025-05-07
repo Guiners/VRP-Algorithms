@@ -10,6 +10,9 @@ package-mode = false
 python = "^3.11"
 tsplib95 = "^0.7.1"
 logger = "^1.4"
+black = "^25.1.0"
+isort = "^6.0.1"
+pylint = "^3.3.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

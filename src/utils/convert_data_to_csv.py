@@ -1,8 +1,11 @@
-import tsplib95
 import csv
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+import tsplib95
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger()
 
 file_path = "../../datasets/raw/kagglesanta2018.197769.tsp"
