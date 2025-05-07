@@ -4,20 +4,23 @@ import logging
 import random
 from typing import List, Tuple
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+from src.utils.constants import (
+    CSV,
+    JSON,
+    RELATIVE_INPUT_CSV_PATH,
+    RELATIVE_OUTPUT_TEST_PATH,
+    RELATIVE_OUTPUT_TRAIN_PATH,
+    RELATIVE_OUTPUT_VALIDATE_PATH,
 )
-logger = logging.getLogger()
+from src.utils.logger_config import logger
 
 
-_CSV = ".csv"
-_JSON = ".json"
 class FileGenerator:
     def __init__(self):
-        self.output_train_path = "../../datasets/train/{path}"
-        self.output_validate_path = "../../datasets/validate/{path}"
-        self.output_test_path = "../../datasets/test/{path}"
-        self.input_csv_path = "../../datasets/raw/cities_in_csv.csv"
+        self.output_train_path = RELATIVE_OUTPUT_TRAIN_PATH
+        self.output_validate_path = RELATIVE_OUTPUT_VALIDATE_PATH
+        self.output_test_path = RELATIVE_OUTPUT_TEST_PATH
+        self.input_csv_path = RELATIVE_INPUT_CSV_PATH
         self.rows, self.header = self.get_info_from_csv()
 
     @staticmethod
@@ -35,8 +38,11 @@ class FileGenerator:
         return f"vpr{cities}_{vehicles}_{instance_number}"
 
     @staticmethod
-    def get_vehicles_number(num_cities: int, min_clients_per_vehicle: int = 20,
-                            max_clients_per_vehicle: int = 30) -> int:
+    def get_vehicles_number(
+        num_cities: int,
+        min_clients_per_vehicle: int = 20,
+        max_clients_per_vehicle: int = 30,
+    ) -> int:
         """Calculates the number of vehicles required based on the number of cities and clients per vehicle.
 
         Args:
@@ -48,7 +54,9 @@ class FileGenerator:
             int: Calculated number of vehicles.
         """
         clients = num_cities - 1
-        clients_per_vehicle = random.randint(min_clients_per_vehicle, max_clients_per_vehicle)
+        clients_per_vehicle = random.randint(
+            min_clients_per_vehicle, max_clients_per_vehicle
+        )
         return max(2, round(clients / clients_per_vehicle))
 
     @staticmethod
@@ -85,7 +93,7 @@ class FileGenerator:
             output_path.format(
                 path=self.generate_file_name(cities, vehicles, instance_number)
             )
-            + _JSON
+            + JSON
         )
         with open(final_output_path, mode="w") as json_file:
             json.dump(data, json_file, indent=4)
@@ -115,7 +123,7 @@ class FileGenerator:
             output_path.format(
                 path=self.generate_file_name(cities, vehicles, instance_number)
             )
-            + _CSV
+            + CSV
         )
         with open(final_output_path, mode="w", newline="") as csv_file:
             writer = csv.writer(csv_file)
@@ -139,7 +147,6 @@ class FileGenerator:
 
         return rows, header
 
-
     def generate_single_file_pair(
         self,
         cities: int,
@@ -160,10 +167,19 @@ class FileGenerator:
             self.header, selected_rows, output_path, vehicles, cities, instance_number
         )
         self.generate_parameters_json(
-            output_path, vehicles, cities, self.get_deport_id(selected_rows), instance_number
+            output_path,
+            vehicles,
+            cities,
+            self.get_deport_id(selected_rows),
+            instance_number,
         )
 
-    def generate_data(self, output_folder_path: str, datasets_sizes: List[int], instances_per_size: int) -> None:
+    def generate_data(
+        self,
+        output_folder_path: str,
+        datasets_sizes: List[int],
+        instances_per_size: int,
+    ) -> None:
         """Generates multiple problem instances as CSV and JSON files.
 
         Args:
@@ -182,8 +198,11 @@ class FileGenerator:
                 )
         logger.info("Finished generating files")
 
-    def generate_train_data(self, datasets_sizes: List[int] = range(101, 401, 50),
-                            instances_per_size: int = 10) -> None:
+    def generate_train_data(
+        self,
+        datasets_sizes: List[int] = range(101, 401, 50),
+        instances_per_size: int = 10,
+    ) -> None:
         """Generates training data files.
 
         Args:
@@ -195,8 +214,11 @@ class FileGenerator:
         """
         self.generate_data(self.output_train_path, datasets_sizes, instances_per_size)
 
-    def generate_validate_data(self, datasets_sizes: List[int] = range(151, 401, 50),
-                               instances_per_size: int = 4) -> None:
+    def generate_validate_data(
+        self,
+        datasets_sizes: List[int] = range(151, 401, 50),
+        instances_per_size: int = 4,
+    ) -> None:
         """Generates validation data files.
 
         Args:
@@ -206,9 +228,15 @@ class FileGenerator:
         Returns:
             None
         """
-        self.generate_data(self.output_validate_path, datasets_sizes, instances_per_size)
+        self.generate_data(
+            self.output_validate_path, datasets_sizes, instances_per_size
+        )
 
-    def generate_test_data(self, datasets_sizes: List[int] = range(201, 501, 100), instances_per_size: int = 4) -> None:
+    def generate_test_data(
+        self,
+        datasets_sizes: List[int] = range(201, 501, 100),
+        instances_per_size: int = 4,
+    ) -> None:
         """Generates test data files.
 
         Args:
@@ -220,8 +248,8 @@ class FileGenerator:
         """
         self.generate_data(self.output_test_path, datasets_sizes, instances_per_size)
 
+
 File_generator = FileGenerator()
 File_generator.generate_train_data()
 File_generator.generate_test_data()
 File_generator.generate_validate_data()
-

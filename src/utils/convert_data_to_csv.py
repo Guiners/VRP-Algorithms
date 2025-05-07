@@ -1,12 +1,8 @@
 import csv
-import logging
 
 import tsplib95
 
-# logging.basicConfig(
-#     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-# )
-logger = logging.getLogger()
+from src.utils.logger_config import logger
 
 file_path = "../../datasets/raw/kagglesanta2018.197769.tsp"
 problem = tsplib95.load(file_path)
