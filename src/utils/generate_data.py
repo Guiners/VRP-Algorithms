@@ -34,17 +34,23 @@ class FileGenerator:
         """
         return f"vpr{cities}_{vehicles}_{instance_number}"
 
+    # @staticmethod
+    # def get_vehicles_number(cities: int) -> int:
+    #     """Calculates the number of vehicles based on the number of cities.
+    #
+    #     Args:
+    #         cities (int): Number of cities.
+    #
+    #     Returns:
+    #         int: Number of vehicles.
+    #     """
+    #     return max(1, cities // 20)
+
     @staticmethod
-    def get_vehicles_number(cities: int) -> int:
-        """Calculates the number of vehicles based on the number of cities.
-
-        Args:
-            cities (int): Number of cities.
-
-        Returns:
-            int: Number of vehicles.
-        """
-        return max(1, cities // 20)
+    def get_vehicles_number(num_cities: int, min_clients_per_vehicle=20, max_clients_per_vehicle=30):
+        clients = num_cities - 1
+        clients_per_vehicle = random.randint(min_clients_per_vehicle, max_clients_per_vehicle)
+        return max(2, round(clients / clients_per_vehicle))
 
     def generate_parameters_json(
         self,
@@ -166,7 +172,7 @@ class FileGenerator:
                 )
         logger.info("Finished generating files")
 
-    def generate_train_data(self, datasets_sizes: List[int] = range(100, 400, 50), instances_per_size: int = 10) -> None:
+    def generate_train_data(self, datasets_sizes: List[int] = range(101, 401, 50), instances_per_size: int = 10) -> None:
         """Generates training data files.
 
         Returns:
@@ -174,7 +180,7 @@ class FileGenerator:
         """
         self.generate_data(self.output_train_path, datasets_sizes, instances_per_size)
 
-    def generate_validate_data(self, datasets_sizes: List[int] = range(150, 400, 50), instances_per_size: int = 4) -> None:
+    def generate_validate_data(self, datasets_sizes: List[int] = range(151, 401, 50), instances_per_size: int = 4) -> None:
         """Generates validation data files.
 
         Returns:
@@ -182,7 +188,7 @@ class FileGenerator:
         """
         self.generate_data(self.output_validate_path, datasets_sizes, instances_per_size)
 
-    def generate_test_data(self, datasets_sizes: List[int] = range(200, 500, 100), instances_per_size: int = 4) -> None:
+    def generate_test_data(self, datasets_sizes: List[int] = range(201, 501, 100), instances_per_size: int = 4) -> None:
         """Generates test data files.
 
         Returns:
