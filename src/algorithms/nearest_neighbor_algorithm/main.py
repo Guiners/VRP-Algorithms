@@ -3,7 +3,7 @@ import time
 import json
 from copy import deepcopy
 
-from src.algorithms.utils.vrp_tools import VehicleInfo, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import VehicleInfo, VRPInstanceLoader
 from src.utils.logger_config import logger
 
 
@@ -55,6 +55,6 @@ class NearestNeighborVRP(VRPInstanceLoader):
         end_time = time.time()
         total_distance_in_km = total_distance_in_meters / 1000
         processing_time = end_time - start_time
-        self.save_results_to_file(total_distance_in_km, processing_time, self.vehicle_info, output_file_path)
+        self.save_results_to_file(total_distance_in_km, processing_time, routes, self.vehicle_info, output_file_path)
 
         return routes

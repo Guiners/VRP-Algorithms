@@ -1,7 +1,7 @@
 import csv
 import json
 import math
-
+from typing import Dict
 from src.utils.logger_config import logger
 
 
@@ -11,8 +11,17 @@ class VRPInstance:
         self.x = x
         self.y = y
 
+    def convert_to_dict(self):
+        return {
+            "city_id": self.city_id,
+            "x": self.x,
+            "y": self.y
+        }
+
     def distance_to(self, other_city):
         return math.hypot(self.x - other_city.x, self.y - other_city.y)
+
+
 
 
 class VRPData:
@@ -59,18 +68,38 @@ class VRPInstanceLoader:
 
         return VRPData(cities=cities, depot=depot, vehicles=vehicles)
 
+
     @staticmethod
-    def save_results_to_file(total_distance_in_km, processing_time, vehicle_info, output_file_path):
+    def decode_routes(routes) -> Dict:
+
+        def routes_generator():
+            car_count = 1
+            for car_route in routes:
+                yield car_route, car_count
+                car_count+=1
+
+        decoded_routes: dict = {}
+        for car_route, car_count in routes_generator():
+            decoded_routes[f"car{car_count}"] = [cities.convert_to_dict() for cities in car_route]
+
+        return decoded_routes
+
+
+    @classmethod
+    def save_results_to_file(cls, total_distance_in_km, processing_time, routes, vehicle_info, output_file_path):
         data_to_save = {
+            "routes": cls.decode_routes(routes),
             "distance": round(total_distance_in_km, 2),
             "processing_time": processing_time,
             "cost": vehicle_info.count_cost(total_distance_in_km),
         }
+        logger.debug("Routes: %s", data_to_save["routes"])
         logger.debug("Total distance: %s", data_to_save["distance"])
         logger.debug("Total processing time: %s", data_to_save["processing_time"])
         logger.debug("Cost of whole operation in $: %s", data_to_save["cost"])
         with open(output_file_path, "w") as json_file:
             json.dump(data_to_save, json_file, indent=4)
+            logger.info("File was created")
 
 
 # data = VRPInstanceLoader.load_dataset("../../../datasets/test/vpr201_7_3.csv", "../../../datasets/test/vpr201_7_3.json")
