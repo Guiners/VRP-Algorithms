@@ -73,10 +73,10 @@ class VRPInstanceLoader:
     def decode_routes(routes) -> Dict:
 
         def routes_generator():
-            car_count = 1
-            for car_route in routes:
-                yield car_route, car_count
-                car_count+=1
+            _car_count = 1
+            for _car_route in routes:
+                yield _car_route, _car_count
+                _car_count+=1
 
         decoded_routes: dict = {}
         for car_route, car_count in routes_generator():
