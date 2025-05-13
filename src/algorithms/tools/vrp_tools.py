@@ -2,6 +2,7 @@ import csv
 import json
 import math
 from typing import Dict
+
 from src.utils.logger_config import logger
 
 
@@ -12,16 +13,10 @@ class VRPInstance:
         self.y = y
 
     def convert_to_dict(self):
-        return {
-            "city_id": self.city_id,
-            "x": self.x,
-            "y": self.y
-        }
+        return {"city_id": self.city_id, "x": self.x, "y": self.y}
 
     def distance_to(self, other_city):
         return math.hypot(self.x - other_city.x, self.y - other_city.y)
-
-
 
 
 class VRPData:
@@ -68,7 +63,6 @@ class VRPInstanceLoader:
 
         return VRPData(cities=cities, depot=depot, vehicles=vehicles)
 
-
     @staticmethod
     def decode_routes(routes) -> Dict:
 
@@ -76,17 +70,25 @@ class VRPInstanceLoader:
             _car_count = 1
             for _car_route in routes:
                 yield _car_route, _car_count
-                _car_count+=1
+                _car_count += 1
 
         decoded_routes: dict = {}
         for car_route, car_count in routes_generator():
-            decoded_routes[f"car{car_count}"] = [cities.convert_to_dict() for cities in car_route]
+            decoded_routes[f"car{car_count}"] = [
+                cities.convert_to_dict() for cities in car_route
+            ]
 
         return decoded_routes
 
-
     @classmethod
-    def save_results_to_file(cls, total_distance_in_km, processing_time, routes, vehicle_info, output_file_path):
+    def save_results_to_file(
+        cls,
+        total_distance_in_km,
+        processing_time,
+        routes,
+        vehicle_info,
+        output_file_path,
+    ):
         data_to_save = {
             "routes": cls.decode_routes(routes),
             "distance": round(total_distance_in_km, 2),

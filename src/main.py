@@ -1,22 +1,24 @@
 import glob
 import os
 import re
-from src.algorithms.nearest_neighbor_algorithm.main import NearestNeighborVRP
+
+from src.algorithms.ant_colony_algorithm import AntColonyVRP
+from src.algorithms.genetic_algorithm import GeneticAlgorithmVRP
+from src.algorithms.nearest_neighbor_algorithm import NearestNeighborVRP
 from src.algorithms.tools.vrp_tools import VehicleInfo
 from src.utils.constants import (
+    ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+    ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+    ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_TEST_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH,
+    ANT_ALGORITHM_NAME,
+    GENETIC_ALGORITHM_NAME,
+    JSON,
     NN_ALGORITHM_NAME,
-ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
-ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH,
-ABSOLUTE_OUTPUT_TEST_FOLDER_PATH,
-GENETIC_ALGORITHM_NAME,
-    JSON
 )
 from src.utils.logger_config import logger
-from src.algorithms.genetic_algorithm.main import GeneticAlgorithmVRP
-
 
 _PATTERN = r"^[^.]+"
 
@@ -33,57 +35,103 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
         output_path = rf"{output_folder_path}\{file_name}{JSON}"
         logger.info("file path %s, output path %s", file_name, output_path)
         algorithm.solve(csv_file, json_file, output_path)
-        file_counter+=1
-        # if file_counter == 2:
-        #     break
+        file_counter += 1
+        if file_counter == 3:
+            break
     logger.info("Created %s files", file_counter)
 
 
+def run_ant_colony_for_train():
+    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
+        ant_colony_algorithm,
+    )
 
 
+def run_ant_colony_for_validate():
+    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
+        ant_colony_algorithm,
+    )
+
+
+def run_ant_colony_for_test():
+    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
+        ant_colony_algorithm,
+    )
 
 
 def run_generic_for_train():
     genetic_algorithm = GeneticAlgorithmVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME), genetic_algorithm)
-
+    iterate_files(
+        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        genetic_algorithm,
+    )
 
 
 def run_generic_for_validate():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME), generic_algorithm)
+    iterate_files(
+        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        generic_algorithm,
+    )
 
 
 def run_generic_for_test():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME), generic_algorithm)
+    iterate_files(
+        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        generic_algorithm,
+    )
 
 
 # Nearest neighbor algorithm
 def run_nn_for_train():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
+    iterate_files(
+        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        nn_algorithm,
+    )
+
 
 def run_nn_for_validate():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
+    iterate_files(
+        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        nn_algorithm,
+    )
+
 
 def run_nn_for_test():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
-    iterate_files(ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-                  ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME), nn_algorithm)
-#
-#
-#
-run_nn_for_train()
-run_nn_for_validate()
-run_nn_for_test()
+    iterate_files(
+        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        nn_algorithm,
+    )
 
-run_generic_for_train()
-run_generic_for_validate()
-run_generic_for_test()
+
+
+# run_nn_for_train()
+# run_nn_for_validate()
+# run_nn_for_test()
+#
+# run_generic_for_train()
+# run_generic_for_validate()
+# run_generic_for_test()
+
+run_ant_colony_for_train()
+# run_ant_colony_for_validate()
+# run_ant_colony_for_test()
