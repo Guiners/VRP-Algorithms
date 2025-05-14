@@ -52,38 +52,48 @@ class AntColonyVRP(VRPInstanceLoader):
 
         return probabilities
 
-    def _select_next_city(self, probabilities):
-        r = random.random()
-        cumulative = 0.0
-        for city, prob in probabilities:
-            cumulative += prob
-            if r <= cumulative:
-                return city
-        return probabilities[-1][0]  # fallback
+    def _select_next_city(self, probabilities, explore_rate=0.1):
+        #pseudo-greedy
+        if random.random() < explore_rate:
+            # Eksploatuj: wybierz najlepsze prawdopodobieństwo
+            return max(probabilities, key=lambda x: x[1])[0]
+        else:
+            # Eksploruj: wybór probabilistyczny (jak teraz)
+            r = random.random()
+            cumulative = 0.0
+            for city, prob in probabilities:
+                cumulative += prob
+                if r <= cumulative:
+                    return city
+            return probabilities[-1][0]  # fallback
+
+    def _split_into_routes(self, tour, vehicles):
+        base = len(tour) // vehicles
+        extra = len(tour) % vehicles
+        routes = []
+        start = 0
+        for i in range(vehicles):
+            end = start + base + (1 if i < extra else 0)
+            routes.append(tour[start:end])
+            start = end
+        return routes
 
     def _build_solution(self, pheromone, distance, depot_idx, cities, vehicles):
         n = len(cities)
         city_indices = list(range(n))
-        solutions = []
+        unvisited = set(city_indices) - {depot_idx}
+        tour = []
 
-        for _ in range(vehicles):
-            route = []
-            current_city = depot_idx
-            unvisited = set(city_indices) - {depot_idx}
+        current_city = depot_idx
+        while unvisited:
+            probabilities = self._calculate_probabilities(current_city, unvisited, pheromone, distance)
+            next_city = self._select_next_city(probabilities, explore_rate=0.1)
+            tour.append(next_city)
+            unvisited.remove(next_city)
+            current_city = next_city
 
-            while unvisited:
-                probabilities = self._calculate_probabilities(
-                    current_city, unvisited, pheromone, distance
-                )
-                next_city = self._select_next_city(probabilities)
-                route.append(next_city)
-                unvisited.remove(next_city)
-                current_city = next_city
-                if len(solutions) + 1 == vehicles and not unvisited:
-                    break
-
-            solutions.append(route)
-        return solutions
+        routes = self._split_into_routes(tour, vehicles)
+        return routes
 
     def _route_distance(self, route, distance, depot_idx):
         total = 0
@@ -100,9 +110,12 @@ class AntColonyVRP(VRPInstanceLoader):
             for j in range(n):
                 pheromone[i][j] *= 1 - self.rho
 
-        for solution in solutions:
+        ranked = sorted(solutions, key=lambda sol: sum(self._route_distance(r, distance, depot_idx) for r in sol))
+        top_solutions = ranked[:max(1, len(ranked) // 5)]
+
+        for solution in top_solutions:
+            d = sum(self._route_distance(route, distance, depot_idx) for route in solution)
             for route in solution:
-                d = self._route_distance(route, distance, depot_idx)
                 for i in range(len(route)):
                     from_city = depot_idx if i == 0 else route[i - 1]
                     to_city = route[i]
@@ -110,6 +123,18 @@ class AntColonyVRP(VRPInstanceLoader):
                     pheromone[to_city][from_city] += self.q / d
                 pheromone[route[-1]][depot_idx] += self.q / d
                 pheromone[depot_idx][route[-1]] += self.q / d
+
+        # Elitarna aktualizacja
+        best_solution = min(solutions, key=lambda sol: sum(self._route_distance(r, distance, depot_idx) for r in sol))
+        best_distance = sum(self._route_distance(route, distance, depot_idx) for route in best_solution)
+        for route in best_solution:
+            for i in range(len(route)):
+                from_city = depot_idx if i == 0 else route[i - 1]
+                to_city = route[i]
+                pheromone[from_city][to_city] += (self.q * 2) / best_distance  # Wzmocnienie elitarne
+                pheromone[to_city][from_city] += (self.q * 2) / best_distance
+            pheromone[route[-1]][depot_idx] += (self.q * 2) / best_distance
+            pheromone[depot_idx][route[-1]] += (self.q * 2) / best_distance
 
     def _simulate_once(self, cities, depot_idx, vehicles, max_iter=5):
         n = len(cities)
@@ -145,8 +170,8 @@ class AntColonyVRP(VRPInstanceLoader):
             beta = random.uniform(2.0, 5.0)
             rho = random.uniform(0.1, 0.9)
             q = random.uniform(10, 500)
-            num_ants = random.randint(10, min(n, 100))
-            num_iterations = random.randint(50, 300)
+            num_ants = random.randint(15, min(n, 200))
+            num_iterations = random.randint(75, 400)
 
             candidate = AntColonyVRP(
                 vehicle_info=self.vehicle_info,
@@ -209,6 +234,10 @@ class AntColonyVRP(VRPInstanceLoader):
                     best_distance = total_dist
                     best_solution = deepcopy(solution)
                     logger.info("New best solution with distance: %.2f", best_distance)
+
+            # Elitism: jeśli najlepsze rozwiązanie nie było wcześniej w rozwiązaniach, dodaj je
+            if best_solution not in all_solutions:
+                all_solutions.append(best_solution)
 
             self._update_pheromones(pheromone, all_solutions, distance, depot_idx)
 

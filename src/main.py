@@ -2,9 +2,13 @@ import glob
 import os
 import re
 
-from src.algorithms.ant_colony_algorithm import AntColonyVRP
+
+from src.algorithms.grasp_algorithm import GRASPVRP
+from src.algorithms.clarke_wright_savings_algorithm import ClarkeWrightSavingsVRP
 from src.algorithms.genetic_algorithm import GeneticAlgorithmVRP
 from src.algorithms.nearest_neighbor_algorithm import NearestNeighborVRP
+
+
 from src.algorithms.tools.vrp_tools import VehicleInfo
 from src.utils.constants import (
     ABSOLUTE_INPUT_TEST_FOLDER_PATH,
@@ -13,10 +17,11 @@ from src.utils.constants import (
     ABSOLUTE_OUTPUT_TEST_FOLDER_PATH,
     ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
     ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH,
-    ANT_ALGORITHM_NAME,
+    CLARKE_WRIGHT_SAVINGS_NAME,
     GENETIC_ALGORITHM_NAME,
     JSON,
     NN_ALGORITHM_NAME,
+    GRASP_ALGORITHM_NAME
 )
 from src.utils.logger_config import logger
 
@@ -36,35 +41,62 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
         logger.info("file path %s, output path %s", file_name, output_path)
         algorithm.solve(csv_file, json_file, output_path)
         file_counter += 1
-        if file_counter == 3:
-            break
+
     logger.info("Created %s files", file_counter)
 
 
-def run_ant_colony_for_train():
-    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+
+
+def run_grasp_for_train():
+    grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
         ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
-        ant_colony_algorithm,
+        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        grasp_algorithm,
     )
 
 
-def run_ant_colony_for_validate():
-    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+def run_grasp_for_validate():
+    grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
         ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
-        ant_colony_algorithm,
+        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        grasp_algorithm,
     )
 
 
-def run_ant_colony_for_test():
-    ant_colony_algorithm = AntColonyVRP(vehicle_info)
+def run_grasp_for_test():
+    grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
         ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=ANT_ALGORITHM_NAME),
-        ant_colony_algorithm,
+        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        grasp_algorithm,
+    )
+
+def run_clarke_wright_savings_for_train():
+    clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        clarke_wright_savings_algorithm,
+    )
+
+
+def run_clarke_wright_savings_for_validate():
+    clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        clarke_wright_savings_algorithm,
+    )
+
+
+def run_clarke_wright_savings_for_test():
+    clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        clarke_wright_savings_algorithm,
     )
 
 
@@ -132,6 +164,12 @@ def run_nn_for_test():
 # run_generic_for_validate()
 # run_generic_for_test()
 
-run_ant_colony_for_train()
-# run_ant_colony_for_validate()
-# run_ant_colony_for_test()
+# run_clarke_wright_savings_for_train()
+# run_clarke_wright_savings_for_validate()
+# run_clarke_wright_savings_for_test()
+
+
+
+run_grasp_for_train()
+# run_grasp_for_validate()
+# run_grasp_for_test()

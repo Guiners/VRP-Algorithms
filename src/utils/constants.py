@@ -22,4 +22,5 @@ RELATIVE_INPUT_CSV_PATH = "../../datasets/raw/cities_in_csv.csv"
 
 NN_ALGORITHM_NAME = "nearest_neighbor_algorithm"
 GENETIC_ALGORITHM_NAME = "genetic_algorithm"
-ANT_ALGORITHM_NAME = "ant_colony_algorithm"
+CLARKE_WRIGHT_SAVINGS_NAME = "clarke_wright_savings"
+GRASP_ALGORITHM_NAME = "grasp"
