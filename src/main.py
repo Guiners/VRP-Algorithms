@@ -156,20 +156,18 @@ def run_nn_for_test():
 
 
 
-# run_nn_for_train()
-# run_nn_for_validate()
-# run_nn_for_test()
-#
-# run_generic_for_train()
-# run_generic_for_validate()
-# run_generic_for_test()
+run_nn_for_train()
+run_nn_for_validate()
+run_nn_for_test()
 
-# run_clarke_wright_savings_for_train()
-# run_clarke_wright_savings_for_validate()
-# run_clarke_wright_savings_for_test()
+run_generic_for_train()
+run_generic_for_validate()
+run_generic_for_test()
 
-
+run_clarke_wright_savings_for_train()
+run_clarke_wright_savings_for_validate()
+run_clarke_wright_savings_for_test()
 
 run_grasp_for_train()
-# run_grasp_for_validate()
-# run_grasp_for_test()
+run_grasp_for_validate()
+run_grasp_for_test()
