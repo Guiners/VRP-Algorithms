@@ -16,7 +16,7 @@ class NearestNeighborVRP(VRPInstanceLoader):
         return math.hypot(city1.x - city2.x, city1.y - city2.y)
 
     def solve(self, csv_path, config_path, output_file_path):
-        logger.info("Started to work")
+        logger.debug("Started to work")
         start_time = time.time()
         data = self.load_dataset(csv_path, config_path)
         clients = deepcopy(data.cities)

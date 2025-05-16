@@ -101,7 +101,7 @@ class VRPInstanceLoader:
         logger.debug("Cost of whole operation in $: %s", data_to_save["cost"])
         with open(output_file_path, "w") as json_file:
             json.dump(data_to_save, json_file, indent=4)
-            logger.info("File was created")
+            logger.debug("File was created")
 
 
 # data = VRPInstanceLoader.load_dataset("../../../datasets/test/vpr201_7_3.csv", "../../../datasets/test/vpr201_7_3.json")

@@ -38,9 +38,11 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
     for csv_file, json_file in zip(csv_files, json_files):
         file_name = f"{re.search(_PATTERN, csv_file).group()}_results"
         output_path = rf"{output_folder_path}\{file_name}{JSON}"
-        logger.info("file path %s, output path %s", file_name, output_path)
+        logger.debug("file path %s, output path %s", file_name, output_path)
         algorithm.solve(csv_file, json_file, output_path)
         file_counter += 1
+        # if file_counter == 2:
+        #     break
 
     logger.info("Created %s files", file_counter)
 

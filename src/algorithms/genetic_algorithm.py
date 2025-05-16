@@ -10,10 +10,14 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
     def __init__(
         self,
         vehicle_info,
-        population_size=100,
-        generations=300,
+        population_size=200,
+        generations=500,
         mutation_rate=0.1,
         tournament_size=5,
+        use_biased_selection=False,
+        seed_count=10,
+        elite_fraction=0.1,
+        relocate_samples_per_vehicle=5
     ):
         super().__init__()
         self.population_size = population_size
@@ -21,202 +25,236 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         self.mutation_rate = mutation_rate
         self.tournament_size = tournament_size
         self.vehicle_info = vehicle_info
+        self.use_biased = use_biased_selection
+        self.seed_count = seed_count
+        self.elite_fraction = elite_fraction
+        self.relocate_samples = relocate_samples_per_vehicle
         logger.info(
-            "Initialized GeneticAlgorithmVRP with population_size=%d, generations=%d, mutation_rate=%.2f, tournament_size=%d",
-            population_size,
-            generations,
-            mutation_rate,
-            tournament_size,
+            "GA init: pop=%d, gen=%d, mut=%.2f, tourn=%d, biased=%s, seeds=%d",
+            population_size, generations, mutation_rate, tournament_size,
+            use_biased_selection, seed_count
         )
 
     def _distance(self, route, depot):
-        distance = 0
-        current = depot
+        d = 0
+        cur = depot
         for city in route:
-            distance += current.distance_to(city)
-            current = city
-        distance += current.distance_to(depot)
-        return distance
+            d += cur.distance_to(city)
+            cur = city
+        d += cur.distance_to(depot)
+        return d
 
     def _split_into_routes(self, chromosome, vehicles):
         n = len(chromosome)
-        base_size = n // vehicles
-        remainder = n % vehicles
-        routes = []
-        start = 0
+        base = n // vehicles
+        rem = n % vehicles
+        routes, start = [], 0
         for i in range(vehicles):
-            end = start + base_size + (1 if i < remainder else 0)
+            end = start + base + (1 if i < rem else 0)
             routes.append(chromosome[start:end])
             start = end
         return routes
 
     def _fitness(self, chromosome, vehicles, depot):
-        total_distance = 0
-        routes = self._split_into_routes(chromosome, vehicles)
-        for route in routes:
-            total_distance += self._distance(route, depot)
-        return total_distance
+        total = 0
+        for route in self._split_into_routes(chromosome, vehicles):
+            total += self._distance(route, depot)
+        return total
 
     def _create_individual(self, cities):
-        individual = cities[:]
-        random.shuffle(individual)
-        return individual
+        ind = cities[:]
+        random.shuffle(ind)
+        return ind
+
+    def _nearest_neighbor_chromosome(self, cities, depot):
+        unvisited = set(cities)
+        tour = []
+        cur = depot
+        while unvisited:
+            nxt = min(unvisited, key=lambda c: cur.distance_to(c))
+            tour.append(nxt)
+            unvisited.remove(nxt)
+            cur = nxt
+        return tour
+
+    def _seed_population(self, cities, depot):
+        seeds = []
+        for _ in range(min(self.seed_count, self.population_size)):
+            chrom = self._nearest_neighbor_chromosome(cities, depot)
+            seeds.append(chrom[:])
+        return seeds
 
     def _tournament_selection(self, population, vehicles, depot):
-        tournament = random.sample(population, self.tournament_size)
-        return min(
-            tournament, key=lambda chromo: self._fitness(chromo, vehicles, depot)
-        )
+        tour = random.sample(population, self.tournament_size)
+        return min(tour, key=lambda c: self._fitness(c, vehicles, depot))
 
-    def _crossover(self, parent1, parent2):
-        size = len(parent1)
-        start, end = sorted(random.sample(range(size), 2))
-        child = [None] * size
-        child[start:end] = parent1[start:end]
+    def _biased_selection(self, population, vehicles, depot):
+        inv_fits = [1.0/(self._fitness(c, vehicles, depot)+1e-9) for c in population]
+        total = sum(inv_fits)
+        pick = random.random()*total
+        cum = 0
+        for c, w in zip(population, inv_fits):
+            cum += w
+            if cum >= pick:
+                return c
+        return population[-1]
 
-        pointer = 0
-        for city in parent2:
+    def _crossover(self, p1, p2):
+        size = len(p1)
+        a, b = sorted(random.sample(range(size), 2))
+        child = [None]*size
+        child[a:b] = p1[a:b]
+        pos = b
+        for city in p2[b:]+p2[:b]:
             if city not in child:
-                while pointer < size and child[pointer] is not None:
-                    pointer += 1
-                if pointer < size:
-                    child[pointer] = city
-                else:
-                    break
+                if pos>=size: pos=0
+                child[pos] = city
+                pos+=1
         return child
 
-    def _mutate(self, chromosome):
-        for i in range(len(chromosome)):
-            if random.random() < self.mutation_rate:
-                j = random.randint(0, len(chromosome) - 1)
-                chromosome[i], chromosome[j] = chromosome[j], chromosome[i]
-        return chromosome
+    def _rbx_crossover(self, p1, p2, vehicles):
+        r1 = self._split_into_routes(p1, vehicles)
+        r2 = self._split_into_routes(p2, vehicles)
+        take1 = random.sample(r1, vehicles//2)
+        take2 = random.sample(r2, vehicles - len(take1))
+        child_routes = take1 + take2
+        used = set()
+        final = []
+        for route in child_routes:
+            filt = [c for c in route if c not in used]
+            used |= set(filt)
+            final.append(filt)
+        leftovers = [c for c in p1 if c not in used]
+        idx = 0
+        for c in leftovers:
+            final[idx % vehicles].append(c)
+            idx += 1
+        return [city for route in final for city in route]
 
-    # def auto_tune_params(self, cities):
-    #     n = len(cities)
-    #     logger.info("Auto-tuning parameters for %d cities", n)
-    #     if n <= 30:
-    #         self.population_size = 30
-    #         self.generations = 100
-    #         self.mutation_rate = 0.05
-    #         self.tournament_size = 2
-    #     elif n <= 100:
-    #         self.population_size = 50
-    #         self.generations = 200
-    #         self.mutation_rate = 0.1
-    #         self.tournament_size = 5
-    #     else:
-    #         self.population_size = 100
-    #         self.generations = 500
-    #         self.mutation_rate = 0.15
-    #         self.tournament_size = 10
-    #     logger.info(
-    #         "Tuned parameters: population_size=%d, generations=%d, mutation_rate=%.2f, tournament_size=%d",
-    #         self.population_size,
-    #         self.generations,
-    #         self.mutation_rate,
-    #         self.tournament_size,
-    #     )
+    def _mutate(self, chrom):
+        for i in range(len(chrom)):
+            if random.random()<self.mutation_rate:
+                j = random.randrange(len(chrom))
+                chrom[i], chrom[j] = chrom[j], chrom[i]
+        return chrom
 
-    def random_search_params(self, data, iterations=100):
-        n = len(data.cities)
+    def _two_opt_route(self, route, depot, max_swaps=1):
+        best = route
+        swaps = 0
+        for i in range(1, len(best)-2):
+            if swaps>=max_swaps: break
+            for j in range(i+1, len(best)-1):
+                new = best[:i] + best[i:j+1][::-1] + best[j+1:]
+                if self._distance(new, depot) < self._distance(best, depot):
+                    best = new
+                    swaps +=1
+                    break
+        return best
 
-        best_config = None
-        best_score = float('inf')
+    def _relocate(self, routes, depot):
+        # random sample of relocate moves
+        n_veh = len(routes)
+        for _ in range(self.relocate_samples * n_veh):
+            i = random.randrange(n_veh)
+            if len(routes[i]) <= 2: continue
+            j = random.randrange(1, len(routes[i])-1)
+            city = routes[i][j]
+            k = random.randrange(n_veh)
+            if k == i: continue
+            pos = random.randrange(1, len(routes[k]))
+            # simulate
+            r1 = routes[i][:j] + routes[i][j+1:]
+            r2 = routes[k][:pos] + [city] + routes[k][pos:]
+            gain = (self._distance(r1, depot)+self._distance(r2, depot)) - \
+                   (self._distance(routes[i], depot)+self._distance(routes[k], depot))
+            if gain < 0:
+                routes[i].pop(j)
+                routes[k].insert(pos, city)
+        return routes
 
-        for _ in range(iterations):
-            logger.info("Random search")
-            self.population_size = random.randint(30, 150 if n > 100 else 100)
-            self.generations = random.randint(100, 500)
-            self.mutation_rate = round(random.uniform(0.01, 0.3), 3)
-            self.tournament_size = random.randint(2, 10)
-
-            population = [self._create_individual(data.cities) for _ in range(self.population_size)]
-            best_individual = min(population, key=lambda c: self._fitness(c, data.vehicles,
-                                                                          data.depot))
-            score = self._fitness(best_individual, data.vehicles, data.depot)
-
-            if score < best_score:
-                best_score = score
-                best_config = (self.population_size, self.generations, self.mutation_rate, self.tournament_size)
-
-        self.population_size, self.generations, self.mutation_rate, self.tournament_size = best_config
-        logger.info("Random search selected: pop=%d, gen=%d, mut=%.3f, tourn=%d",
-                    self.population_size, self.generations, self.mutation_rate, self.tournament_size)
+    def _exchange(self, routes, depot):
+        # random sample of exchange moves
+        n_veh = len(routes)
+        for _ in range(self.relocate_samples * n_veh):
+            i = random.randrange(n_veh)
+            j = random.randrange(1, len(routes[i])-1) if len(routes[i])>2 else None
+            k = random.randrange(n_veh)
+            if k <= i or j is None or len(routes[k])<=2: continue
+            l = random.randrange(1, len(routes[k])-1)
+            c1, c2 = routes[i][j], routes[k][l]
+            r1 = routes[i][:j] + [c2] + routes[i][j+1:]
+            r2 = routes[k][:l] + [c1] + routes[k][l+1:]
+            gain = (self._distance(r1, depot)+self._distance(r2, depot)) - \
+                   (self._distance(routes[i], depot)+self._distance(routes[k], depot))
+            if gain < 0:
+                routes[i][j], routes[k][l] = c2, c1
+        return routes
 
     def solve(self, csv_path, config_path, output_file_path):
-        logger.info("Started solving VRP using Genetic Algorithm")
-        start_time = time.time()
+        logger.info("GA solve start")
+        t0 = time.time()
         data = self.load_dataset(csv_path, config_path)
+        cities, vehicles, depot = data.cities, data.vehicles, data.depot
+        logger.info("Data: %d cities, %d vehicles", len(cities), vehicles)
 
-        logger.info(
-            "Loaded dataset with %d cities and %d vehicles",
-            len(data.cities),
-            data.vehicles,
-        )
-        self.random_search_params(data)
-        population = [
-            self._create_individual(data.cities) for _ in range(self.population_size)
-        ]
-        best_individual = min(
-            population,
-            key=lambda chromo: self._fitness(chromo, data.vehicles, data.depot),
-        )
-        best_fitness = self._fitness(best_individual, data.vehicles, data.depot)
-        logger.info("Initial best fitness: %.2f", best_fitness)
+        # initial population
+        seeds = self._seed_population(cities, depot)
+        rand = [self._create_individual(cities) for _ in range(self.population_size - len(seeds))]
+        population = seeds + rand
 
-        for generation in range(self.generations):
-            new_population = [deepcopy(best_individual)]  # Elitism
-            while len(new_population) < self.population_size:
-                parent1 = self._tournament_selection(
-                    population, data.vehicles, data.depot
-                )
-                parent2 = self._tournament_selection(
-                    population, data.vehicles, data.depot
-                )
-                child = self._crossover(parent1, parent2)
+        best = min(population, key=lambda c: self._fitness(c,vehicles,depot))
+        best_fit = self._fitness(best,vehicles,depot)
+
+        for gen in range(1, self.generations+1):
+            logger.info("Generation %s", gen)
+
+            # generate all offspring
+            offspring = []
+            while len(offspring) < self.population_size:
+                if self.use_biased:
+                    p1 = self._biased_selection(population, vehicles, depot)
+                    p2 = self._biased_selection(population, vehicles, depot)
+                else:
+                    p1 = self._tournament_selection(population, vehicles, depot)
+                    p2 = self._tournament_selection(population, vehicles, depot)
+
+                if random.random() < 0.5:
+                    child = self._rbx_crossover(p1, p2, vehicles)
+                else:
+                    child = self._crossover(p1, p2)
                 self._mutate(child)
-                new_population.append(child)
+                offspring.append(child)
 
-            population = new_population
-            current_best = min(
-                population,
-                key=lambda chromo: self._fitness(chromo, data.vehicles, data.depot),
-            )
-            current_fitness = self._fitness(current_best, data.vehicles, data.depot)
+            # evaluate
+            scored = [(self._fitness(c,vehicles,depot), c) for c in offspring]
+            scored.sort(key=lambda x: x[0])
+            elite_count = max(1, int(self.elite_fraction * self.population_size))
+            elites = [c for _,c in scored[:elite_count]]
+            others = [c for _,c in scored[elite_count:]]
 
-            if current_fitness < best_fitness:
-                best_individual = deepcopy(current_best)
-                best_fitness = current_fitness
-                logger.info(
-                    "Generation %d - New best fitness: %.2f",
-                    generation + 1,
-                    best_fitness,
-                )
+            # memetic local search on elites
+            new_pop = []
+            for c in elites:
+                routes = self._split_into_routes(c, vehicles)
+                routes = [self._two_opt_route(r, depot) for r in routes]
+                routes = self._relocate(routes, depot)
+                routes = self._exchange(routes, depot)
+                new_pop.append([city for r in routes for city in r])
 
-            if generation % 10 == 0 or generation == self.generations - 1:
-                logger.debug(
-                    "Generation %d - Current best: %.2f",
-                    generation + 1,
-                    current_fitness,
-                )
+            # fill up with rest without LS
+            new_pop += others[:self.population_size - len(new_pop)]
+            population = new_pop
 
-        end_time = time.time()
-        processing_time = end_time - start_time
-        total_distance_km = best_fitness / 1000
+            # update best
+            cur, fit = min([(c, self._fitness(c,vehicles,depot)) for c in population], key=lambda x: x[1])
+            if fit < best_fit:
+                best, best_fit = deepcopy(cur), fit
 
-        logger.info("Optimization completed in %.2f seconds", processing_time)
-        logger.info("Total distance: %.2f km", total_distance_km)
+        elapsed = time.time() - t0
+        km = best_fit/1000
+        logger.info("GA done in %.2f s, distance=%.2f km", elapsed, km)
 
-        routes = self._split_into_routes(best_individual, data.vehicles)
-        routes = [[data.depot] + r + [data.depot] for r in routes]
-        self.save_results_to_file(
-            total_distance_km,
-            processing_time,
-            routes,
-            self.vehicle_info,
-            output_file_path,
-        )
-
-        logger.info("Results saved to %s", output_file_path)
-        return routes
+        final_routes = self._split_into_routes(best, vehicles)
+        final_routes = [[depot]+r+[depot] for r in final_routes]
+        self.save_results_to_file(km, elapsed, final_routes, self.vehicle_info, output_file_path)
+        return final_routes
