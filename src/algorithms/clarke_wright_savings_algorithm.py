@@ -20,9 +20,11 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
             for j in range(i + 1, len(cities)):
                 c1 = cities[i]
                 c2 = cities[j]
-                saving = (self._distance(depot, c1) +
-                          self._distance(depot, c2) -
-                          self._distance(c1, c2))
+                saving = (
+                    self._distance(depot, c1)
+                    + self._distance(depot, c2)
+                    - self._distance(c1, c2)
+                )
                 savings.append(((c1.city_id, c2.city_id), saving))
         savings.sort(key=lambda x: x[1], reverse=True)
         return savings
@@ -87,7 +89,11 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
         logger.info("Started solving VRP using Clarke-Wright Savings")
         start_time = time.time()
         data = self.load_dataset(csv_path, config_path)
-        logger.info("Loaded dataset with %d cities and %d vehicles", len(data.cities), data.vehicles)
+        logger.info(
+            "Loaded dataset with %d cities and %d vehicles",
+            len(data.cities),
+            data.vehicles,
+        )
 
         initial_routes = self._initialize_routes(data.cities, data.depot)
 
@@ -106,7 +112,7 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
             processing_time,
             merged_routes,
             self.vehicle_info,
-            output_file_path
+            output_file_path,
         )
 
         logger.info("Results saved to %s", output_file_path)

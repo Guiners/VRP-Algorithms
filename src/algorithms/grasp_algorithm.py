@@ -1,5 +1,5 @@
-import time
 import random
+import time
 from copy import deepcopy
 
 from src.algorithms.tools.vrp_tools import VRPInstanceLoader
@@ -10,7 +10,7 @@ class GRASPVRP(VRPInstanceLoader):
     def __init__(self, vehicle_info, max_iter=100, neighborhood_size=5):
         super().__init__()
         self.vehicle_info = vehicle_info
-        self.max_iter = max_iter                # liczba prób GRASP
+        self.max_iter = max_iter  # liczba prób GRASP
         self.neighborhood_size = neighborhood_size  # początkowy rozmiar RCL
         logger.info("Initialized GRASP VRP algorithm")
 
@@ -27,7 +27,7 @@ class GRASPVRP(VRPInstanceLoader):
         start = 0
         for i in range(v):
             size = base + (1 if i < rem else 0)
-            chunks.append(cities[start:start+size])
+            chunks.append(cities[start : start + size])
             start += size
         return chunks
 
@@ -44,7 +44,7 @@ class GRASPVRP(VRPInstanceLoader):
             # posortuj nieodwiedzone wg odległości
             neighbors = sorted(
                 [(city, self._distance(current, city)) for city in unvisited],
-                key=lambda x: x[1]
+                key=lambda x: x[1],
             )
             # ogranicz do RCL: rcl_size najbliższych
             rcl = [city for city, _ in neighbors[:rcl_size]]
@@ -67,8 +67,8 @@ class GRASPVRP(VRPInstanceLoader):
         while improved:
             improved = False
             for i in range(1, len(best) - 2):
-                for j in range(i+1, len(best) - 1):
-                    candidate = best[:i] + best[i:j+1][::-1] + best[j+1:]
+                for j in range(i + 1, len(best) - 1):
+                    candidate = best[:i] + best[i : j + 1][::-1] + best[j + 1 :]
                     cand_dist = self._route_distance(candidate)
                     if cand_dist < best_dist:
                         best = candidate
@@ -99,38 +99,36 @@ class GRASPVRP(VRPInstanceLoader):
         chunks = self._split_cities(cities, vehicles)
 
         best_solution = None
-        best_distance = float('inf')
+        best_distance = float("inf")
 
         for iteration in range(self.max_iter):
-            logger.debug("GRASP iteration %d/%d", iteration+1, self.max_iter)
+            logger.debug("GRASP iteration %d/%d", iteration + 1, self.max_iter)
             rcl_size = self.neighborhood_size
 
             initial_routes = [
-                self._construct_route(chunk, depot, rcl_size)
-                for chunk in chunks
+                self._construct_route(chunk, depot, rcl_size) for chunk in chunks
             ]
 
-            improved_routes = [
-                self._two_opt(route)
-                for route in initial_routes
-            ]
+            improved_routes = [self._two_opt(route) for route in initial_routes]
 
             total_dist = self._total_distance(improved_routes)
             if total_dist < best_distance:
                 best_distance = total_dist
                 best_solution = deepcopy(improved_routes)
-                logger.info(" New best at iter %d: %.2f", iteration+1, best_distance)
+                logger.info(" New best at iter %d: %.2f", iteration + 1, best_distance)
 
         processing_time = time.time() - start_time
         total_km = best_distance / 1000.0
 
-        logger.info("GRASP completed in %.2f s, distance %.2f km", processing_time, total_km)
+        logger.info(
+            "GRASP completed in %.2f s, distance %.2f km", processing_time, total_km
+        )
         self.save_results_to_file(
             total_km,
             processing_time,
             best_solution,
             self.vehicle_info,
-            output_file_path
+            output_file_path,
         )
         logger.info("Results saved to %s", output_file_path)
         return best_solution

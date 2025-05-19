@@ -1,0 +1,5 @@
+method,avg_total_distance,avg_cost,avg_time_sec,avg_distance_per_sec,avg_cost_per_sec,avg_coef_variation_length,avg_num_vehicles,std_route_length_std
+nearest_neighbor_algorithm,109789.24,92222.97,0.0,50284624.25,42239084.24,0.08,5.33,1570579.21
+clarke_wright_savings,111110.99,93333.23,0.02,9498256.46,7978535.33,0.3,5.33,6325102.39
+grasp,92170.7,77423.39,22.62,5235.57,4397.88,0.06,5.33,955943.34
+genetic_algorithm,61075.74,51303.62,64.95,1010.8,849.08,0.24,5.33,2815171.81

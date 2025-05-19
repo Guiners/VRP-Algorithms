@@ -2,28 +2,25 @@ import glob
 import os
 import re
 
-
-from src.algorithms.grasp_algorithm import GRASPVRP
 from src.algorithms.clarke_wright_savings_algorithm import ClarkeWrightSavingsVRP
 from src.algorithms.genetic_algorithm import GeneticAlgorithmVRP
+from src.algorithms.grasp_algorithm import GRASPVRP
 from src.algorithms.nearest_neighbor_algorithm import NearestNeighborVRP
-
-
 from src.algorithms.tools.vrp_tools import VehicleInfo
 from src.utils.constants import (
-    ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
-    ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
     ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH,
+    ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+    ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
     ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH,
     CLARKE_WRIGHT_SAVINGS_NAME,
     GENETIC_ALGORITHM_NAME,
+    GRASP_ALGORITHM_NAME,
     JSON,
     NN_ALGORITHM_NAME,
-    GRASP_ALGORITHM_NAME
 )
 from src.utils.logger_config import logger
 
@@ -50,8 +47,6 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
     logger.info("Created %s files", file_counter)
 
 
-
-
 def run_grasp_for_medium():
     grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
@@ -68,6 +63,7 @@ def run_grasp_for_large():
         ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
         grasp_algorithm,
     )
+
 
 def run_grasp_for_xlarge():
     grasp_algorithm = GRASPVRP(vehicle_info)
@@ -86,6 +82,7 @@ def run_grasp_for_small():
         grasp_algorithm,
     )
 
+
 def run_clarke_wright_savings_for_medium():
     clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
     iterate_files(
@@ -102,6 +99,7 @@ def run_clarke_wright_savings_for_large():
         ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
         clarke_wright_savings_algorithm,
     )
+
 
 def run_clarke_wright_savings_for_xlarge():
     clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
@@ -138,6 +136,7 @@ def run_generic_for_large():
         generic_algorithm,
     )
 
+
 def run_generic_for_xlarge():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
     iterate_files(
@@ -145,6 +144,7 @@ def run_generic_for_xlarge():
         ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
         generic_algorithm,
     )
+
 
 def run_generic_for_small():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
@@ -173,6 +173,7 @@ def run_nn_for_large():
         nn_algorithm,
     )
 
+
 def run_nn_for_xlarge():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
     iterate_files(
@@ -190,21 +191,22 @@ def run_nn_for_small():
         nn_algorithm,
     )
 
-# run_nn_for_xlarge()
-# run_nn_for_small()
-# run_nn_for_medium()
-# run_nn_for_large()
-#
-#
-# run_generic_for_xlarge()
-# run_generic_for_small()
-# run_generic_for_medium()
-# run_generic_for_large()
-#
-# run_clarke_wright_savings_for_xlarge()
-# run_clarke_wright_savings_for_small()
-# run_clarke_wright_savings_for_medium()
-# run_clarke_wright_savings_for_large()
+
+run_nn_for_xlarge()
+run_nn_for_small()
+run_nn_for_medium()
+run_nn_for_large()
+
+
+run_generic_for_xlarge()
+run_generic_for_small()
+run_generic_for_medium()
+run_generic_for_large()
+
+run_clarke_wright_savings_for_xlarge()
+run_clarke_wright_savings_for_small()
+run_clarke_wright_savings_for_medium()
+run_clarke_wright_savings_for_large()
 
 
 run_grasp_for_xlarge()

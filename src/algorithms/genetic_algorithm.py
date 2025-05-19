@@ -17,7 +17,7 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         use_biased_selection=False,
         seed_count=10,
         elite_fraction=0.1,
-        relocate_samples_per_vehicle=5
+        relocate_samples_per_vehicle=5,
     ):
         super().__init__()
         self.population_size = population_size
@@ -31,8 +31,12 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         self.relocate_samples = relocate_samples_per_vehicle
         logger.info(
             "GA init: pop=%d, gen=%d, mut=%.2f, tourn=%d, biased=%s, seeds=%d",
-            population_size, generations, mutation_rate, tournament_size,
-            use_biased_selection, seed_count
+            population_size,
+            generations,
+            mutation_rate,
+            tournament_size,
+            use_biased_selection,
+            seed_count,
         )
 
     def _distance(self, route, depot):
@@ -89,9 +93,11 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         return min(tour, key=lambda c: self._fitness(c, vehicles, depot))
 
     def _biased_selection(self, population, vehicles, depot):
-        inv_fits = [1.0/(self._fitness(c, vehicles, depot)+1e-9) for c in population]
+        inv_fits = [
+            1.0 / (self._fitness(c, vehicles, depot) + 1e-9) for c in population
+        ]
         total = sum(inv_fits)
-        pick = random.random()*total
+        pick = random.random() * total
         cum = 0
         for c, w in zip(population, inv_fits):
             cum += w
@@ -102,20 +108,21 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
     def _crossover(self, p1, p2):
         size = len(p1)
         a, b = sorted(random.sample(range(size), 2))
-        child = [None]*size
+        child = [None] * size
         child[a:b] = p1[a:b]
         pos = b
-        for city in p2[b:]+p2[:b]:
+        for city in p2[b:] + p2[:b]:
             if city not in child:
-                if pos>=size: pos=0
+                if pos >= size:
+                    pos = 0
                 child[pos] = city
-                pos+=1
+                pos += 1
         return child
 
     def _rbx_crossover(self, p1, p2, vehicles):
         r1 = self._split_into_routes(p1, vehicles)
         r2 = self._split_into_routes(p2, vehicles)
-        take1 = random.sample(r1, vehicles//2)
+        take1 = random.sample(r1, vehicles // 2)
         take2 = random.sample(r2, vehicles - len(take1))
         child_routes = take1 + take2
         used = set()
@@ -133,7 +140,7 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
 
     def _mutate(self, chrom):
         for i in range(len(chrom)):
-            if random.random()<self.mutation_rate:
+            if random.random() < self.mutation_rate:
                 j = random.randrange(len(chrom))
                 chrom[i], chrom[j] = chrom[j], chrom[i]
         return chrom
@@ -141,13 +148,14 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
     def _two_opt_route(self, route, depot, max_swaps=1):
         best = route
         swaps = 0
-        for i in range(1, len(best)-2):
-            if swaps>=max_swaps: break
-            for j in range(i+1, len(best)-1):
-                new = best[:i] + best[i:j+1][::-1] + best[j+1:]
+        for i in range(1, len(best) - 2):
+            if swaps >= max_swaps:
+                break
+            for j in range(i + 1, len(best) - 1):
+                new = best[:i] + best[i : j + 1][::-1] + best[j + 1 :]
                 if self._distance(new, depot) < self._distance(best, depot):
                     best = new
-                    swaps +=1
+                    swaps += 1
                     break
         return best
 
@@ -156,17 +164,20 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         n_veh = len(routes)
         for _ in range(self.relocate_samples * n_veh):
             i = random.randrange(n_veh)
-            if len(routes[i]) <= 2: continue
-            j = random.randrange(1, len(routes[i])-1)
+            if len(routes[i]) <= 2:
+                continue
+            j = random.randrange(1, len(routes[i]) - 1)
             city = routes[i][j]
             k = random.randrange(n_veh)
-            if k == i: continue
+            if k == i:
+                continue
             pos = random.randrange(1, len(routes[k]))
             # simulate
-            r1 = routes[i][:j] + routes[i][j+1:]
+            r1 = routes[i][:j] + routes[i][j + 1 :]
             r2 = routes[k][:pos] + [city] + routes[k][pos:]
-            gain = (self._distance(r1, depot)+self._distance(r2, depot)) - \
-                   (self._distance(routes[i], depot)+self._distance(routes[k], depot))
+            gain = (self._distance(r1, depot) + self._distance(r2, depot)) - (
+                self._distance(routes[i], depot) + self._distance(routes[k], depot)
+            )
             if gain < 0:
                 routes[i].pop(j)
                 routes[k].insert(pos, city)
@@ -177,15 +188,17 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         n_veh = len(routes)
         for _ in range(self.relocate_samples * n_veh):
             i = random.randrange(n_veh)
-            j = random.randrange(1, len(routes[i])-1) if len(routes[i])>2 else None
+            j = random.randrange(1, len(routes[i]) - 1) if len(routes[i]) > 2 else None
             k = random.randrange(n_veh)
-            if k <= i or j is None or len(routes[k])<=2: continue
-            l = random.randrange(1, len(routes[k])-1)
+            if k <= i or j is None or len(routes[k]) <= 2:
+                continue
+            l = random.randrange(1, len(routes[k]) - 1)
             c1, c2 = routes[i][j], routes[k][l]
-            r1 = routes[i][:j] + [c2] + routes[i][j+1:]
-            r2 = routes[k][:l] + [c1] + routes[k][l+1:]
-            gain = (self._distance(r1, depot)+self._distance(r2, depot)) - \
-                   (self._distance(routes[i], depot)+self._distance(routes[k], depot))
+            r1 = routes[i][:j] + [c2] + routes[i][j + 1 :]
+            r2 = routes[k][:l] + [c1] + routes[k][l + 1 :]
+            gain = (self._distance(r1, depot) + self._distance(r2, depot)) - (
+                self._distance(routes[i], depot) + self._distance(routes[k], depot)
+            )
             if gain < 0:
                 routes[i][j], routes[k][l] = c2, c1
         return routes
@@ -199,13 +212,16 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
 
         # initial population
         seeds = self._seed_population(cities, depot)
-        rand = [self._create_individual(cities) for _ in range(self.population_size - len(seeds))]
+        rand = [
+            self._create_individual(cities)
+            for _ in range(self.population_size - len(seeds))
+        ]
         population = seeds + rand
 
-        best = min(population, key=lambda c: self._fitness(c,vehicles,depot))
-        best_fit = self._fitness(best,vehicles,depot)
+        best = min(population, key=lambda c: self._fitness(c, vehicles, depot))
+        best_fit = self._fitness(best, vehicles, depot)
 
-        for gen in range(1, self.generations+1):
+        for gen in range(1, self.generations + 1):
             logger.info("Generation %s", gen)
 
             # generate all offspring
@@ -226,11 +242,11 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
                 offspring.append(child)
 
             # evaluate
-            scored = [(self._fitness(c,vehicles,depot), c) for c in offspring]
+            scored = [(self._fitness(c, vehicles, depot), c) for c in offspring]
             scored.sort(key=lambda x: x[0])
             elite_count = max(1, int(self.elite_fraction * self.population_size))
-            elites = [c for _,c in scored[:elite_count]]
-            others = [c for _,c in scored[elite_count:]]
+            elites = [c for _, c in scored[:elite_count]]
+            others = [c for _, c in scored[elite_count:]]
 
             # memetic local search on elites
             new_pop = []
@@ -242,19 +258,24 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
                 new_pop.append([city for r in routes for city in r])
 
             # fill up with rest without LS
-            new_pop += others[:self.population_size - len(new_pop)]
+            new_pop += others[: self.population_size - len(new_pop)]
             population = new_pop
 
             # update best
-            cur, fit = min([(c, self._fitness(c,vehicles,depot)) for c in population], key=lambda x: x[1])
+            cur, fit = min(
+                [(c, self._fitness(c, vehicles, depot)) for c in population],
+                key=lambda x: x[1],
+            )
             if fit < best_fit:
                 best, best_fit = deepcopy(cur), fit
 
         elapsed = time.time() - t0
-        km = best_fit/1000
+        km = best_fit / 1000
         logger.info("GA done in %.2f s, distance=%.2f km", elapsed, km)
 
         final_routes = self._split_into_routes(best, vehicles)
-        final_routes = [[depot]+r+[depot] for r in final_routes]
-        self.save_results_to_file(km, elapsed, final_routes, self.vehicle_info, output_file_path)
+        final_routes = [[depot] + r + [depot] for r in final_routes]
+        self.save_results_to_file(
+            km, elapsed, final_routes, self.vehicle_info, output_file_path
+        )
         return final_routes

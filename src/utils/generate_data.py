@@ -8,10 +8,10 @@ from src.utils.constants import (
     CSV,
     JSON,
     RELATIVE_INPUT_CSV_PATH,
-    RELATIVE_OUTPUT_SMALL_PATH,
-    RELATIVE_OUTPUT_MEDIUM_PATH,
     RELATIVE_OUTPUT_LARGE_PATH,
-    RELATIVE_OUTPUT_XLARGE_PATH
+    RELATIVE_OUTPUT_MEDIUM_PATH,
+    RELATIVE_OUTPUT_SMALL_PATH,
+    RELATIVE_OUTPUT_XLARGE_PATH,
 )
 from src.utils.logger_config import logger
 
@@ -231,9 +231,7 @@ class FileGenerator:
         Returns:
             None
         """
-        self.generate_data(
-            self.output_medium_path, datasets_sizes, instances_per_size
-        )
+        self.generate_data(self.output_medium_path, datasets_sizes, instances_per_size)
 
     def generate_large_data(
         self,
@@ -250,7 +248,6 @@ class FileGenerator:
             None
         """
         self.generate_data(self.output_large_path, datasets_sizes, instances_per_size)
-
 
     def generate_xlarge_data(
         self,
