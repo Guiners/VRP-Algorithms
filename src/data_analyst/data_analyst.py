@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from math import sqrt
 from src.utils.constants import NN_ALGORITHM_NAME, GENETIC_ALGORITHM_NAME, CLARKE_WRIGHT_SAVINGS_NAME, GRASP_ALGORITHM_NAME
-
+from src.utils.logger_config import logger
 _BASE_PATH = os.path.join("..", "..", "results")
 
 METHODS = [
@@ -24,7 +24,7 @@ class DataAnalyst:
             total += sqrt(dx * dx + dy * dy)
         return total
     @staticmethod
-    def compare_results(set_name, result_name=""):
+    def create_result_table(set_name, result_name=""):
         records = []
 
         for method in METHODS:
@@ -72,8 +72,12 @@ class DataAnalyst:
 
         df = pd.DataFrame(records)
         df.sort_values(["instance", "method"], inplace=True)
+        tables_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "results", "tables"))
+        os.makedirs(tables_dir, exist_ok=True)
 
-        output_path = os.path.join(os.path.dirname(__file__), "comparison_results.csv")
+        output_path = os.path.join(tables_dir, f"comparison_results_{set_name}.csv")
         df.to_csv(output_path, index=False)
-        print(f"Zapisano do pliku: {output_path}")
-DataAnalyst.compare_results("train")
+        logger.info(f"Saved to path: {output_path}")
+DataAnalyst.create_result_table("xlarge")
+
+#todo wygenerowac dla wszystkich zbiorow, wyciagnac z tego statystyki typu ktory algorymt sie lepiej sprawdzil, jaki byl najszybszy. Dla konkretnego pliku jak i dla wszystkich plikow

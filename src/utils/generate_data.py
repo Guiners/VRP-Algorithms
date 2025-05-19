@@ -8,18 +8,21 @@ from src.utils.constants import (
     CSV,
     JSON,
     RELATIVE_INPUT_CSV_PATH,
-    RELATIVE_OUTPUT_TEST_PATH,
-    RELATIVE_OUTPUT_TRAIN_PATH,
-    RELATIVE_OUTPUT_VALIDATE_PATH,
+    RELATIVE_OUTPUT_SMALL_PATH,
+    RELATIVE_OUTPUT_MEDIUM_PATH,
+    RELATIVE_OUTPUT_LARGE_PATH,
+    RELATIVE_OUTPUT_XLARGE_PATH
 )
 from src.utils.logger_config import logger
 
 
 class FileGenerator:
     def __init__(self):
-        self.output_train_path = RELATIVE_OUTPUT_TRAIN_PATH
-        self.output_validate_path = RELATIVE_OUTPUT_VALIDATE_PATH
-        self.output_test_path = RELATIVE_OUTPUT_TEST_PATH
+        self.output_small_path = RELATIVE_OUTPUT_SMALL_PATH
+        self.output_medium_path = RELATIVE_OUTPUT_MEDIUM_PATH
+        self.output_large_path = RELATIVE_OUTPUT_LARGE_PATH
+        self.output_xlarge_path = RELATIVE_OUTPUT_XLARGE_PATH
+
         self.input_csv_path = RELATIVE_INPUT_CSV_PATH
         self.rows, self.header = self.get_info_from_csv()
 
@@ -198,10 +201,10 @@ class FileGenerator:
                 )
         logger.info("Finished generating files")
 
-    def generate_train_data(
+    def generate_small_data(
         self,
-        datasets_sizes: List[int] = range(101, 401, 50),
-        instances_per_size: int = 10,
+        datasets_sizes: List[int] = range(51, 251, 50),
+        instances_per_size: int = 3,
     ) -> None:
         """Generates training data files.
 
@@ -212,12 +215,12 @@ class FileGenerator:
         Returns:
             None
         """
-        self.generate_data(self.output_train_path, datasets_sizes, instances_per_size)
+        self.generate_data(self.output_small_path, datasets_sizes, instances_per_size)
 
-    def generate_validate_data(
+    def generate_medium_data(
         self,
-        datasets_sizes: List[int] = range(151, 401, 50),
-        instances_per_size: int = 4,
+        datasets_sizes: List[int] = range(301, 601, 100),
+        instances_per_size: int = 3,
     ) -> None:
         """Generates validation data files.
 
@@ -229,13 +232,13 @@ class FileGenerator:
             None
         """
         self.generate_data(
-            self.output_validate_path, datasets_sizes, instances_per_size
+            self.output_medium_path, datasets_sizes, instances_per_size
         )
 
-    def generate_test_data(
+    def generate_large_data(
         self,
-        datasets_sizes: List[int] = range(201, 501, 100),
-        instances_per_size: int = 4,
+        datasets_sizes: List[int] = range(701, 1001, 100),
+        instances_per_size: int = 3,
     ) -> None:
         """Generates test data files.
 
@@ -246,10 +249,28 @@ class FileGenerator:
         Returns:
             None
         """
-        self.generate_data(self.output_test_path, datasets_sizes, instances_per_size)
+        self.generate_data(self.output_large_path, datasets_sizes, instances_per_size)
+
+
+    def generate_xlarge_data(
+        self,
+        datasets_sizes: List[int] = range(1101, 1501, 200),
+        instances_per_size: int = 3,
+    ) -> None:
+        """Generates test data files.
+
+        Args:
+            datasets_sizes (List[int], optional): List of dataset sizes for test data. Defaults to range(201, 501, 100).
+            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
+
+        Returns:
+            None
+        """
+        self.generate_data(self.output_xlarge_path, datasets_sizes, instances_per_size)
 
 
 File_generator = FileGenerator()
-File_generator.generate_train_data()
-File_generator.generate_test_data()
-File_generator.generate_validate_data()
+File_generator.generate_small_data()
+File_generator.generate_medium_data()
+File_generator.generate_large_data()
+File_generator.generate_xlarge_data()

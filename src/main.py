@@ -11,12 +11,14 @@ from src.algorithms.nearest_neighbor_algorithm import NearestNeighborVRP
 
 from src.algorithms.tools.vrp_tools import VehicleInfo
 from src.utils.constants import (
-    ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-    ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-    ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_TEST_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH,
+    ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+    ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+    ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH,
+    ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH,
+    ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
     CLARKE_WRIGHT_SAVINGS_NAME,
     GENETIC_ALGORITHM_NAME,
     JSON,
@@ -25,6 +27,7 @@ from src.utils.constants import (
 )
 from src.utils.logger_config import logger
 
+# from src.data_analyst.data_analyst import DataAnalyst
 _PATTERN = r"^[^.]+"
 
 vehicle_info = VehicleInfo(avg_fuel_consumption=12, fuel_price=7)
@@ -49,127 +52,162 @@ def iterate_files(input_folder_path, output_folder_path, algorithm):
 
 
 
-def run_grasp_for_train():
+def run_grasp_for_medium():
     grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
         grasp_algorithm,
     )
 
 
-def run_grasp_for_validate():
+def run_grasp_for_large():
     grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        grasp_algorithm,
+    )
+
+def run_grasp_for_xlarge():
+    grasp_algorithm = GRASPVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
         grasp_algorithm,
     )
 
 
-def run_grasp_for_test():
+def run_grasp_for_small():
     grasp_algorithm = GRASPVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH.format(algorithm=GRASP_ALGORITHM_NAME),
         grasp_algorithm,
     )
 
-def run_clarke_wright_savings_for_train():
+def run_clarke_wright_savings_for_medium():
     clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
         clarke_wright_savings_algorithm,
     )
 
 
-def run_clarke_wright_savings_for_validate():
+def run_clarke_wright_savings_for_large():
     clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        clarke_wright_savings_algorithm,
+    )
+
+def run_clarke_wright_savings_for_xlarge():
+    clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
         clarke_wright_savings_algorithm,
     )
 
 
-def run_clarke_wright_savings_for_test():
+def run_clarke_wright_savings_for_small():
     clarke_wright_savings_algorithm = ClarkeWrightSavingsVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
+        ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH.format(algorithm=CLARKE_WRIGHT_SAVINGS_NAME),
         clarke_wright_savings_algorithm,
     )
 
 
-def run_generic_for_train():
+def run_generic_for_medium():
     genetic_algorithm = GeneticAlgorithmVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
         genetic_algorithm,
     )
 
 
-def run_generic_for_validate():
+def run_generic_for_large():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
         generic_algorithm,
     )
 
-
-def run_generic_for_test():
+def run_generic_for_xlarge():
     generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
+        generic_algorithm,
+    )
+
+def run_generic_for_small():
+    generic_algorithm = GeneticAlgorithmVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH.format(algorithm=GENETIC_ALGORITHM_NAME),
         generic_algorithm,
     )
 
 
 # Nearest neighbor algorithm
-def run_nn_for_train():
+def run_nn_for_medium():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TRAIN_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TRAIN_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
         nn_algorithm,
     )
 
 
-def run_nn_for_validate():
+def run_nn_for_large():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_VALIDATE_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_VALIDATE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        nn_algorithm,
+    )
+
+def run_nn_for_xlarge():
+    nn_algorithm = NearestNeighborVRP(vehicle_info)
+    iterate_files(
+        ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
         nn_algorithm,
     )
 
 
-def run_nn_for_test():
+def run_nn_for_small():
     nn_algorithm = NearestNeighborVRP(vehicle_info)
     iterate_files(
-        ABSOLUTE_INPUT_TEST_FOLDER_PATH,
-        ABSOLUTE_OUTPUT_TEST_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
+        ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+        ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH.format(algorithm=NN_ALGORITHM_NAME),
         nn_algorithm,
     )
 
+# run_nn_for_xlarge()
+# run_nn_for_small()
+# run_nn_for_medium()
+# run_nn_for_large()
+#
+#
+# run_generic_for_xlarge()
+# run_generic_for_small()
+# run_generic_for_medium()
+# run_generic_for_large()
+#
+# run_clarke_wright_savings_for_xlarge()
+# run_clarke_wright_savings_for_small()
+# run_clarke_wright_savings_for_medium()
+# run_clarke_wright_savings_for_large()
 
 
-run_nn_for_train()
-run_nn_for_validate()
-run_nn_for_test()
-
-run_generic_for_train()
-run_generic_for_validate()
-run_generic_for_test()
-
-run_clarke_wright_savings_for_train()
-run_clarke_wright_savings_for_validate()
-run_clarke_wright_savings_for_test()
-
-run_grasp_for_train()
-run_grasp_for_validate()
-run_grasp_for_test()
+run_grasp_for_xlarge()
+run_grasp_for_small()
+run_grasp_for_medium()
+run_grasp_for_large()
