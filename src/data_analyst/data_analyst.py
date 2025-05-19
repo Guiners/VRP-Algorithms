@@ -185,9 +185,16 @@ class DataAnalyst:
         fig.tight_layout()
 
         if name:
-            path = f"plot_cost_vs_time_dual_axis_{name}.png"
-            plt.savefig(path, dpi=dpi, bbox_inches="tight")
-            logger.info(f"Dual-axis plot saved to: {path}")
+            path = f"plot_cost_vs_time_dual_axis{name}.png"
+            tables_dir = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", "results", "charts")
+            )
+            os.makedirs(tables_dir, exist_ok=True)
+            output_path = os.path.join(tables_dir, path)
+
+            plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
+            logger.info(f"Plot Cost Vs Time Dual Axis saved to: {path}")
+
         plt.show()
 
     @staticmethod
@@ -216,7 +223,13 @@ class DataAnalyst:
 
         if name:
             path = f"plot_normalized_heatmap_{name}.png"
-            plt.savefig(path, dpi=dpi, bbox_inches="tight")
+            tables_dir = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", "results", "charts")
+            )
+            os.makedirs(tables_dir, exist_ok=True)
+            output_path = os.path.join(tables_dir, path)
+
+            plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
             logger.info(f"Heatmap saved to: {path}")
         plt.show()
 
@@ -252,7 +265,13 @@ class DataAnalyst:
 
         if name:
             path = f"plot_cost_vs_distance_scatter_{name}.png"
-            plt.savefig(path, dpi=dpi, bbox_inches="tight")
+            tables_dir = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", "results", "charts")
+            )
+            os.makedirs(tables_dir, exist_ok=True)
+            output_path = os.path.join(tables_dir, path)
+
+            plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
             logger.info(f"Scatter plot saved to: {path}")
         plt.show()
 
