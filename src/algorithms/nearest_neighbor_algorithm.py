@@ -2,27 +2,54 @@ import json
 import math
 import time
 from copy import deepcopy
+from typing import List
 
-from src.algorithms.tools.vrp_tools import VehicleInfo, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import VehicleInfo, VRPInstance, VRPInstanceLoader
 from src.utils.logger_config import logger
 
 
 class NearestNeighborVRP(VRPInstanceLoader):
-    def __init__(self, vehicle_info):
+    """
+    Nearest Neighbor algorithm for the Vehicle Routing Problem (VRP).
+    """
+
+    def __init__(self, vehicle_info: VehicleInfo) -> None:
+        """
+        Initialize the Nearest Neighbor VRP solver.
+
+        :param vehicle_info: Vehicle information (fuel consumption, price, etc.)
+        """
         self.vehicle_info = vehicle_info
 
     @staticmethod
-    def _euclidean_distance(city1, city2):
+    def _euclidean_distance(city1: VRPInstance, city2: VRPInstance) -> float:
+        """
+        Calculate the Euclidean distance between two cities.
+
+        :param city1: First city
+        :param city2: Second city
+        :return: Euclidean distance
+        """
         return math.hypot(city1.x - city2.x, city1.y - city2.y)
 
-    def solve(self, csv_path, config_path, output_file_path):
+    def solve(
+        self, csv_path: str, config_path: str, output_file_path: str
+    ) -> List[List[VRPInstance]]:
+        """
+        Solve the VRP using the Nearest Neighbor heuristic and save the results.
+
+        :param csv_path: Path to the CSV file with city data
+        :param config_path: Path to the JSON config file
+        :param output_file_path: Path to save the results
+        :return: List of routes (each route is a list of VRPInstance)
+        """
         logger.debug("Started to work")
         start_time = time.time()
         data = self.load_dataset(csv_path, config_path)
         clients = deepcopy(data.cities)
-        total_distance_in_meters = 0
+        total_distance_in_meters = 0.0
 
-        routes = [[] for _ in range(data.vehicles)]
+        routes: List[List[VRPInstance]] = [[] for _ in range(data.vehicles)]
         remaining_clients = clients
 
         per_vehicle = len(clients) // data.vehicles

@@ -1,11 +1,13 @@
 import json
 import os
 from math import sqrt
-from typing import Optional
+from typing import Optional, List, Dict, Any
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
 from src.utils.constants import (
     CLARKE_WRIGHT_SAVINGS_NAME,
@@ -14,10 +16,6 @@ from src.utils.constants import (
     NN_ALGORITHM_NAME,
 )
 from src.utils.logger_config import logger
-
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
-
 
 _BASE_PATH = os.path.join("..", "..", "results")
 
@@ -30,8 +28,18 @@ METHODS = [
 
 
 class DataAnalyst:
+    """
+    Class for analyzing and visualizing results of VRP algorithms.
+    """
+
     @staticmethod
-    def _route_length(route):
+    def _route_length(route: List[Dict[str, Any]]) -> float:
+        """
+        Calculate the total length of a route.
+
+        :param route: List of dicts with 'x' and 'y' coordinates
+        :return: Total route length
+        """
         total = 0.0
         for a, b in zip(route, route[1:]):
             dx, dy = a["x"] - b["x"], a["y"] - b["y"]
@@ -39,7 +47,13 @@ class DataAnalyst:
         return total
 
     @staticmethod
-    def save_results(df, file_name):
+    def save_results(df: pd.DataFrame, file_name: str) -> None:
+        """
+        Save DataFrame with results to CSV file.
+
+        :param df: DataFrame to save
+        :param file_name: Output file name (without extension)
+        """
         tables_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "..", "results", "tables")
         )
@@ -49,7 +63,13 @@ class DataAnalyst:
         logger.info(f"Saved to path: {output_path}")
 
     @staticmethod
-    def create_summary(df):
+    def create_summary(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Create summary statistics for each method.
+
+        :param df: DataFrame with results
+        :return: Summary DataFrame
+        """
         summary = (
             df.groupby("method")
             .agg(
@@ -67,26 +87,53 @@ class DataAnalyst:
         )
 
         summary = summary.round(2)
-
         logger.info(f"Saved to path: {summary}")
         return summary
 
-    def get_best_by_speed(self, summary, name):
+    def get_best_by_speed(self, summary: pd.DataFrame, name: str) -> pd.DataFrame:
+        """
+        Sort summary by average processing time.
+
+        :param summary: Summary DataFrame
+        :param name: Name for output file
+        :return: Sorted DataFrame
+        """
         df = summary.sort_values("avg_time_sec")
         self.save_results(df, f"{name}_avg_time_sec")
         return df
 
-    def get_best_by_variation(self, summary, name):
+    def get_best_by_variation(self, summary: pd.DataFrame, name: str) -> pd.DataFrame:
+        """
+        Sort summary by coefficient of variation of route length.
+
+        :param summary: Summary DataFrame
+        :param name: Name for output file
+        :return: Sorted DataFrame
+        """
         df = summary.sort_values("avg_coef_variation_length")
         self.save_results(df, f"{name}_avg_coef_variation_length")
         return df
 
-    def get_best_by_cost(self, summary, name):
+    def get_best_by_cost(self, summary: pd.DataFrame, name: str) -> pd.DataFrame:
+        """
+        Sort summary by average cost.
+
+        :param summary: Summary DataFrame
+        :param name: Name for output file
+        :return: Sorted DataFrame
+        """
         df = summary.sort_values("avg_cost")
         self.save_results(df, f"{name}_avg_cost")
         return df
 
-    def create_result_table(self, set_name, result_name=""):
+    def create_result_table(self, set_name: str, result_name: str = "") -> pd.DataFrame:
+        """
+        Create a result table for a given dataset.
+
+        :param set_name: Name of the dataset (e.g. 'small', 'medium')
+        :param result_name: Specific result file name (optional)
+        :return: DataFrame with results
+        """
         records = []
 
         for method in METHODS:
@@ -113,7 +160,7 @@ class DataAnalyst:
                 ]
                 stops_counts = [
                     len(r) - 2 for r in data["routes"].values()
-                ]  # -2 bo nie liczymy depozyciku na początku i końcu
+                ]  # -2: do not count depot at start/end
 
                 records.append(
                     {
@@ -156,13 +203,14 @@ class DataAnalyst:
 
     @staticmethod
     def plot_cost_vs_time_dual_axis(
-            data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
+        data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
     ) -> None:
         """
         Dual-axis bar/line plot for avg_cost and avg_time_sec per method.
 
-        - avg_cost plotted as bars (left Y-axis)
-        - avg_time_sec plotted as points/line (right Y-axis)
+        :param data: DataFrame with summary statistics
+        :param name: Optional name for saving the plot
+        :param dpi: Dots per inch for saved plot
         """
         required = {"method", "avg_cost", "avg_time_sec"}
         if not required.issubset(data.columns):
@@ -171,13 +219,28 @@ class DataAnalyst:
         fig, ax1 = plt.subplots(figsize=(10, 6))
 
         # Left Y-axis: avg_cost
-        sns.barplot(data=data, x="method", y="avg_cost", ax=ax1, color="skyblue", label="Avg Cost")
+        sns.barplot(
+            data=data,
+            x="method",
+            y="avg_cost",
+            ax=ax1,
+            color="skyblue",
+            label="Avg Cost",
+        )
         ax1.set_ylabel("Average Cost", color="skyblue")
         ax1.tick_params(axis="y", labelcolor="skyblue")
 
         # Right Y-axis: avg_time_sec
         ax2 = ax1.twinx()
-        sns.pointplot(data=data, x="method", y="avg_time_sec", ax=ax2, color="red", label="Avg Time", markers="o")
+        sns.pointplot(
+            data=data,
+            x="method",
+            y="avg_time_sec",
+            ax=ax2,
+            color="red",
+            label="Avg Time",
+            markers="o",
+        )
         ax2.set_ylabel("Average Time (sec)", color="red")
         ax2.tick_params(axis="y", labelcolor="red")
 
@@ -199,10 +262,14 @@ class DataAnalyst:
 
     @staticmethod
     def plot_normalized_heatmap(
-            data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
+        data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
     ) -> None:
         """
         Heatmap of normalized metrics for each VRP algorithm.
+
+        :param data: DataFrame with summary statistics
+        :param name: Optional name for saving the plot
+        :param dpi: Dots per inch for saved plot
         """
         if "method" not in data.columns:
             raise ValueError("Data must contain 'method' column.")
@@ -235,10 +302,14 @@ class DataAnalyst:
 
     @staticmethod
     def plot_cost_vs_distance_scatter(
-            data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
+        data: pd.DataFrame, name: Optional[str] = None, dpi: int = 300
     ) -> None:
         """
         Scatter plot comparing total distance and cost per method.
+
+        :param data: DataFrame with summary statistics
+        :param name: Optional name for saving the plot
+        :param dpi: Dots per inch for saved plot
         """
         required = {"method", "avg_cost", "avg_total_distance"}
         if not required.issubset(data.columns):
@@ -274,48 +345,3 @@ class DataAnalyst:
             plt.savefig(output_path, dpi=dpi, bbox_inches="tight")
             logger.info(f"Scatter plot saved to: {path}")
         plt.show()
-
-
-data_analyst = DataAnalyst()
-df_small = data_analyst.create_result_table("small")
-df_medium = data_analyst.create_result_table("medium")
-df_large = data_analyst.create_result_table("large")
-df_xlarge = data_analyst.create_result_table("xlarge")
-
-# todo wygenerowac dla wszystkich zbiorow, wyciagnac z tego statystyki typu ktory algorymt sie lepiej sprawdzil, jaki byl najszybszy. Dla konkretnego pliku jak i dla wszystkich plikow
-summary_small = data_analyst.create_summary(df_small)
-data_analyst.get_best_by_speed(summary_small, "small")
-data_analyst.get_best_by_variation(summary_small, "small")
-data_analyst.get_best_by_cost(summary_small, "small")
-
-summary_medium = data_analyst.create_summary(df_medium)
-data_analyst.get_best_by_speed(summary_medium, "medium")
-data_analyst.get_best_by_variation(summary_medium, "medium")
-data_analyst.get_best_by_cost(summary_medium, "medium")
-
-summary_large = data_analyst.create_summary(df_large)
-data_analyst.get_best_by_speed(summary_large, "large")
-data_analyst.get_best_by_variation(summary_large, "large")
-data_analyst.get_best_by_cost(summary_large, "large")
-
-summary_xlarge = data_analyst.create_summary(df_xlarge)
-data_analyst.get_best_by_speed(summary_xlarge, "xlarge")
-data_analyst.get_best_by_variation(summary_xlarge, "xlarge")
-data_analyst.get_best_by_cost(summary_xlarge, "xlarge")
-
-
-data_analyst.plot_cost_vs_time_dual_axis(summary_small, "small")
-data_analyst.plot_normalized_heatmap(summary_small, "small")
-data_analyst.plot_cost_vs_distance_scatter(summary_small, "small")
-
-data_analyst.plot_cost_vs_time_dual_axis(summary_medium, "medium")
-data_analyst.plot_normalized_heatmap(summary_medium, "medium")
-data_analyst.plot_cost_vs_distance_scatter(summary_medium, "medium")
-
-data_analyst.plot_cost_vs_time_dual_axis(summary_large, "large")
-data_analyst.plot_normalized_heatmap(summary_large, "large")
-data_analyst.plot_cost_vs_distance_scatter(summary_large, "large")
-
-data_analyst.plot_cost_vs_time_dual_axis(summary_xlarge, "xlarge")
-data_analyst.plot_normalized_heatmap(summary_xlarge, "xlarge")
-data_analyst.plot_cost_vs_distance_scatter(summary_xlarge, "xlarge")

@@ -5,19 +5,19 @@ import random
 from typing import List, Tuple
 
 from src.utils.constants import (
-    CSV,
-    JSON,
-    RELATIVE_INPUT_CSV_PATH,
-    RELATIVE_OUTPUT_LARGE_PATH,
-    RELATIVE_OUTPUT_MEDIUM_PATH,
-    RELATIVE_OUTPUT_SMALL_PATH,
-    RELATIVE_OUTPUT_XLARGE_PATH,
+    CSV, JSON, RELATIVE_INPUT_CSV_PATH,
+    RELATIVE_OUTPUT_LARGE_PATH, RELATIVE_OUTPUT_MEDIUM_PATH,
+    RELATIVE_OUTPUT_SMALL_PATH, RELATIVE_OUTPUT_XLARGE_PATH
 )
 from src.utils.logger_config import logger
 
 
 class FileGenerator:
-    def __init__(self):
+    """
+    Class for generating VRP problem instances as CSV and JSON files.
+    """
+
+    def __init__(self) -> None:
         self.output_small_path = RELATIVE_OUTPUT_SMALL_PATH
         self.output_medium_path = RELATIVE_OUTPUT_MEDIUM_PATH
         self.output_large_path = RELATIVE_OUTPUT_LARGE_PATH
@@ -28,15 +28,13 @@ class FileGenerator:
 
     @staticmethod
     def generate_file_name(cities: int, vehicles: int, instance_number: int) -> str:
-        """Generates a file name based on the number of cities, vehicles, and instance number.
+        """
+        Generates a file name based on the number of cities, vehicles, and instance number.
 
-        Args:
-            cities (int): Number of cities.
-            vehicles (int): Number of vehicles.
-            instance_number (int): Instance number.
-
-        Returns:
-            str: Generated file name.
+        :param cities: Number of cities.
+        :param vehicles: Number of vehicles.
+        :param instance_number: Instance number.
+        :return: Generated file name.
         """
         return f"vpr{cities}_{vehicles}_{instance_number}"
 
@@ -46,15 +44,13 @@ class FileGenerator:
         min_clients_per_vehicle: int = 20,
         max_clients_per_vehicle: int = 30,
     ) -> int:
-        """Calculates the number of vehicles required based on the number of cities and clients per vehicle.
+        """
+        Calculates the number of vehicles required based on the number of cities and clients per vehicle.
 
-        Args:
-            num_cities (int): Total number of cities.
-            min_clients_per_vehicle (int, optional): Minimum number of clients per vehicle. Defaults to 20.
-            max_clients_per_vehicle (int, optional): Maximum number of clients per vehicle. Defaults to 30.
-
-        Returns:
-            int: Calculated number of vehicles.
+        :param num_cities: Total number of cities.
+        :param min_clients_per_vehicle: Minimum number of clients per vehicle.
+        :param max_clients_per_vehicle: Maximum number of clients per vehicle.
+        :return: Calculated number of vehicles.
         """
         clients = num_cities - 1
         clients_per_vehicle = random.randint(
@@ -64,13 +60,11 @@ class FileGenerator:
 
     @staticmethod
     def get_deport_id(selected_rows: List[List[str]]) -> int:
-        """Selects a random depot ID from the selected rows.
+        """
+        Selects a random depot ID from the selected rows.
 
-        Args:
-            selected_rows (List[List[str]]): List of selected rows, where each row is a list of strings.
-
-        Returns:
-            int: Depot ID selected randomly from the first column of the rows.
+        :param selected_rows: List of selected rows, where each row is a list of strings.
+        :return: Depot ID selected randomly from the first column of the rows.
         """
         return int(random.choice(selected_rows)[0])
 
@@ -82,14 +76,14 @@ class FileGenerator:
         depot_id: int,
         instance_number: int,
     ) -> None:
-        """Generates a JSON file with parameters for the problem instance.
+        """
+        Generates a JSON file with parameters for the problem instance.
 
-        Args:
-            output_path (str): Path to save the JSON file.
-            vehicles (int): Number of vehicles.
-            cities (int): Number of cities.
-            depot_id (int): Depot ID.
-            instance_number (int): Instance number.
+        :param output_path: Path to save the JSON file.
+        :param vehicles: Number of vehicles.
+        :param cities: Number of cities.
+        :param depot_id: Depot ID.
+        :param instance_number: Instance number.
         """
         data = {"cities": cities, "vehicles": vehicles, "depot_id": depot_id}
         final_output_path = (
@@ -112,15 +106,15 @@ class FileGenerator:
         cities: int,
         instance_number: int,
     ) -> None:
-        """Generates a CSV file with selected rows.
+        """
+        Generates a CSV file with selected rows.
 
-        Args:
-            header (List[str]): Header of the CSV file.
-            selected_rows (List[List[str]]): Selected rows to write to the CSV file.
-            output_path (str): Path to save the CSV file.
-            vehicles (int): Number of vehicles.
-            cities (int): Number of cities.
-            instance_number (int): Instance number.
+        :param header: Header of the CSV file.
+        :param selected_rows: Selected rows to write to the CSV file.
+        :param output_path: Path to save the CSV file.
+        :param vehicles: Number of vehicles.
+        :param cities: Number of cities.
+        :param instance_number: Instance number.
         """
         final_output_path = (
             output_path.format(
@@ -138,10 +132,10 @@ class FileGenerator:
         )
 
     def get_info_from_csv(self) -> Tuple[List[List[str]], List[str]]:
-        """Reads a CSV file and extracts its header and rows.
+        """
+        Reads a CSV file and extracts its header and rows.
 
-        Returns:
-            Tuple[List[List[str]], List[str]]: A tuple containing rows and the header.
+        :return: A tuple containing rows and the header.
         """
         with open(self.input_csv_path, mode="r") as csv_file:
             reader = csv.reader(csv_file)
@@ -157,13 +151,13 @@ class FileGenerator:
         instance_number: int,
         output_path: str,
     ) -> None:
-        """Generates a pair of CSV and JSON files for a single problem instance.
+        """
+        Generates a pair of CSV and JSON files for a single problem instance.
 
-        Args:
-            cities (int): Number of cities.
-            vehicles (int): Number of vehicles.
-            instance_number (int): Instance number.
-            output_path (str): Path to save the output files.
+        :param cities: Number of cities.
+        :param vehicles: Number of vehicles.
+        :param instance_number: Instance number.
+        :param output_path: Path to save the output files.
         """
         selected_rows = random.sample(self.rows, min(cities, len(self.rows)))
         self.generate_csv_data(
@@ -183,15 +177,12 @@ class FileGenerator:
         datasets_sizes: List[int],
         instances_per_size: int,
     ) -> None:
-        """Generates multiple problem instances as CSV and JSON files.
+        """
+        Generates multiple problem instances as CSV and JSON files.
 
-        Args:
-            output_folder_path (str): Path to the output folder where files will be saved.
-            datasets_sizes (List[int]): List of dataset sizes, representing the number of cities.
-            instances_per_size (int): Number of instances to generate for each dataset size.
-
-        Returns:
-            None
+        :param output_folder_path: Path to the output folder where files will be saved.
+        :param datasets_sizes: List of dataset sizes, representing the number of cities.
+        :param instances_per_size: Number of instances to generate for each dataset size.
         """
         for cities in datasets_sizes:
             for instance_number in range(1, instances_per_size):
@@ -206,14 +197,11 @@ class FileGenerator:
         datasets_sizes: List[int] = range(51, 251, 50),
         instances_per_size: int = 3,
     ) -> None:
-        """Generates training data files.
+        """
+        Generates training data files.
 
-        Args:
-            datasets_sizes (List[int], optional): List of dataset sizes for training data. Defaults to range(101, 401, 50).
-            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 10.
-
-        Returns:
-            None
+        :param datasets_sizes: List of dataset sizes for training data.
+        :param instances_per_size: Number of instances to generate for each dataset size.
         """
         self.generate_data(self.output_small_path, datasets_sizes, instances_per_size)
 
@@ -222,14 +210,11 @@ class FileGenerator:
         datasets_sizes: List[int] = range(301, 601, 100),
         instances_per_size: int = 3,
     ) -> None:
-        """Generates validation data files.
+        """
+        Generates validation data files.
 
-        Args:
-            datasets_sizes (List[int], optional): List of dataset sizes for validation data. Defaults to range(151, 401, 50).
-            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
-
-        Returns:
-            None
+        :param datasets_sizes: List of dataset sizes for validation data.
+        :param instances_per_size: Number of instances to generate for each dataset size.
         """
         self.generate_data(self.output_medium_path, datasets_sizes, instances_per_size)
 
@@ -238,14 +223,11 @@ class FileGenerator:
         datasets_sizes: List[int] = range(701, 1001, 100),
         instances_per_size: int = 3,
     ) -> None:
-        """Generates test data files.
+        """
+        Generates test data files.
 
-        Args:
-            datasets_sizes (List[int], optional): List of dataset sizes for test data. Defaults to range(201, 501, 100).
-            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
-
-        Returns:
-            None
+        :param datasets_sizes: List of dataset sizes for test data.
+        :param instances_per_size: Number of instances to generate for each dataset size.
         """
         self.generate_data(self.output_large_path, datasets_sizes, instances_per_size)
 
@@ -254,14 +236,11 @@ class FileGenerator:
         datasets_sizes: List[int] = range(1101, 1501, 200),
         instances_per_size: int = 3,
     ) -> None:
-        """Generates test data files.
+        """
+        Generates test data files.
 
-        Args:
-            datasets_sizes (List[int], optional): List of dataset sizes for test data. Defaults to range(201, 501, 100).
-            instances_per_size (int, optional): Number of instances to generate for each dataset size. Defaults to 4.
-
-        Returns:
-            None
+        :param datasets_sizes: List of dataset sizes for test data.
+        :param instances_per_size: Number of instances to generate for each dataset size.
         """
         self.generate_data(self.output_xlarge_path, datasets_sizes, instances_per_size)
 
