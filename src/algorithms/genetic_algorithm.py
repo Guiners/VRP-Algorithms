@@ -1,9 +1,10 @@
 import random
 import time
 from copy import deepcopy
-from typing import List, Any
+from typing import Any, List
 
-from src.algorithms.tools.vrp_tools import VRPInstance, VehicleInfo, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import (VehicleInfo, VRPInstance,
+                                            VRPInstanceLoader)
 from src.utils.logger_config import logger
 
 
@@ -73,7 +74,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         d += cur.distance_to(depot)
         return d
 
-    def _split_into_routes(self, chromosome: List[VRPInstance], vehicles: int) -> List[List[VRPInstance]]:
+    def _split_into_routes(
+        self, chromosome: List[VRPInstance], vehicles: int
+    ) -> List[List[VRPInstance]]:
         """
         Split a chromosome into routes for each vehicle.
 
@@ -91,7 +94,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
             start = end
         return routes
 
-    def _fitness(self, chromosome: List[VRPInstance], vehicles: int, depot: VRPInstance) -> float:
+    def _fitness(
+        self, chromosome: List[VRPInstance], vehicles: int, depot: VRPInstance
+    ) -> float:
         """
         Calculate the fitness (total distance) of a chromosome.
 
@@ -116,7 +121,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
         random.shuffle(ind)
         return ind
 
-    def _nearest_neighbor_chromosome(self, cities: List[VRPInstance], depot: VRPInstance) -> List[VRPInstance]:
+    def _nearest_neighbor_chromosome(
+        self, cities: List[VRPInstance], depot: VRPInstance
+    ) -> List[VRPInstance]:
         """
         Create an individual using the nearest neighbor heuristic.
 
@@ -134,7 +141,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
             cur = nxt
         return tour
 
-    def _seed_population(self, cities: List[VRPInstance], depot: VRPInstance) -> List[List[VRPInstance]]:
+    def _seed_population(
+        self, cities: List[VRPInstance], depot: VRPInstance
+    ) -> List[List[VRPInstance]]:
         """
         Generate initial population using nearest neighbor heuristic.
 
@@ -185,7 +194,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
                 return c
         return population[-1]
 
-    def _crossover(self, p1: List[VRPInstance], p2: List[VRPInstance]) -> List[VRPInstance]:
+    def _crossover(
+        self, p1: List[VRPInstance], p2: List[VRPInstance]
+    ) -> List[VRPInstance]:
         """
         Perform ordered crossover (OX) between two parents.
 
@@ -272,7 +283,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
                     break
         return best
 
-    def _relocate(self, routes: List[List[VRPInstance]], depot: VRPInstance) -> List[List[VRPInstance]]:
+    def _relocate(
+        self, routes: List[List[VRPInstance]], depot: VRPInstance
+    ) -> List[List[VRPInstance]]:
         """
         Try to relocate cities between routes to improve the solution.
 
@@ -301,7 +314,9 @@ class GeneticAlgorithmVRP(VRPInstanceLoader):
                 routes[k].insert(pos, city)
         return routes
 
-    def _exchange(self, routes: List[List[VRPInstance]], depot: VRPInstance) -> List[List[VRPInstance]]:
+    def _exchange(
+        self, routes: List[List[VRPInstance]], depot: VRPInstance
+    ) -> List[List[VRPInstance]]:
         """
         Try to exchange cities between routes to improve the solution.
 

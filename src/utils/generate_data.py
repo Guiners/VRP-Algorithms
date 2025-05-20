@@ -4,11 +4,11 @@ import logging
 import random
 from typing import List, Tuple
 
-from src.utils.constants import (
-    CSV, JSON, RELATIVE_INPUT_CSV_PATH,
-    RELATIVE_OUTPUT_LARGE_PATH, RELATIVE_OUTPUT_MEDIUM_PATH,
-    RELATIVE_OUTPUT_SMALL_PATH, RELATIVE_OUTPUT_XLARGE_PATH
-)
+from src.utils.constants import (CSV, JSON, RELATIVE_INPUT_CSV_PATH,
+                                 RELATIVE_OUTPUT_LARGE_PATH,
+                                 RELATIVE_OUTPUT_MEDIUM_PATH,
+                                 RELATIVE_OUTPUT_SMALL_PATH,
+                                 RELATIVE_OUTPUT_XLARGE_PATH)
 from src.utils.logger_config import logger
 
 

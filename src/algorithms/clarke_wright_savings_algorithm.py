@@ -1,8 +1,9 @@
 import time
 from copy import deepcopy
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from src.algorithms.tools.vrp_tools import VRPInstance, VehicleInfo, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import (VehicleInfo, VRPInstance,
+                                            VRPInstanceLoader)
 from src.utils.logger_config import logger
 
 
@@ -31,7 +32,9 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
         """
         return city1.distance_to(city2)
 
-    def _calculate_savings(self, cities: List[VRPInstance], depot: VRPInstance) -> List[Any]:
+    def _calculate_savings(
+        self, cities: List[VRPInstance], depot: VRPInstance
+    ) -> List[Any]:
         """
         Calculates the savings for all pairs of cities.
 
@@ -53,7 +56,9 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
         savings.sort(key=lambda x: x[1], reverse=True)
         return savings
 
-    def _initialize_routes(self, cities: List[VRPInstance], depot: VRPInstance) -> Dict[int, List[VRPInstance]]:
+    def _initialize_routes(
+        self, cities: List[VRPInstance], depot: VRPInstance
+    ) -> Dict[int, List[VRPInstance]]:
         """
         Initializes routes, each city in its own route starting and ending at the depot.
 
@@ -70,7 +75,7 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
         self,
         routes: Dict[int, List[VRPInstance]],
         savings_list: List[Any],
-        max_vehicles: int
+        max_vehicles: int,
     ) -> List[List[VRPInstance]]:
         """
         Merges routes based on the savings list until the number of routes matches the number of vehicles.
@@ -136,10 +141,7 @@ class ClarkeWrightSavingsVRP(VRPInstanceLoader):
         return total
 
     def solve(
-        self,
-        csv_path: str,
-        config_path: str,
-        output_file_path: str
+        self, csv_path: str, config_path: str, output_file_path: str
     ) -> List[List[VRPInstance]]:
         """
         Solves the VRP using the Clarke-Wright Savings algorithm and saves the results.

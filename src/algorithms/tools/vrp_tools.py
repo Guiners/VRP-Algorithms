@@ -1,7 +1,7 @@
 import csv
 import json
 import math
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from src.utils.logger_config import logger
 
@@ -34,7 +34,9 @@ class VRPData:
     Holds the data for a VRP problem instance.
     """
 
-    def __init__(self, cities: List[VRPInstance], depot: VRPInstance, vehicles: int) -> None:
+    def __init__(
+        self, cities: List[VRPInstance], depot: VRPInstance, vehicles: int
+    ) -> None:
         self.cities: List[VRPInstance] = cities
         self.depot: VRPInstance = depot
         self.vehicles: int = vehicles
@@ -92,10 +94,13 @@ class VRPInstanceLoader:
         return VRPData(cities=cities, depot=depot, vehicles=vehicles)
 
     @staticmethod
-    def decode_routes(routes: List[List[VRPInstance]]) -> Dict[str, List[Dict[str, Any]]]:
+    def decode_routes(
+        routes: List[List[VRPInstance]],
+    ) -> Dict[str, List[Dict[str, Any]]]:
         """
         Converts a list of routes (each route is a list of VRPInstance) to a dictionary format.
         """
+
         def routes_generator():
             _car_count = 1
             for _car_route in routes:

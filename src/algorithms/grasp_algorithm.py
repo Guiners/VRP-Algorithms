@@ -1,9 +1,10 @@
 import random
 import time
 from copy import deepcopy
-from typing import List, Any
+from typing import Any, List
 
-from src.algorithms.tools.vrp_tools import VRPInstance, VehicleInfo, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import (VehicleInfo, VRPInstance,
+                                            VRPInstanceLoader)
 from src.utils.logger_config import logger
 
 
@@ -12,7 +13,9 @@ class GRASPVRP(VRPInstanceLoader):
     GRASP (Greedy Randomized Adaptive Search Procedure) algorithm for the Vehicle Routing Problem (VRP).
     """
 
-    def __init__(self, vehicle_info: VehicleInfo, max_iter: int = 100, neighborhood_size: int = 5) -> None:
+    def __init__(
+        self, vehicle_info: VehicleInfo, max_iter: int = 100, neighborhood_size: int = 5
+    ) -> None:
         """
         Initialize the GRASP VRP solver.
 
@@ -36,7 +39,9 @@ class GRASPVRP(VRPInstanceLoader):
         """
         return city1.distance_to(city2)
 
-    def _split_cities(self, cities: List[VRPInstance], v: int) -> List[List[VRPInstance]]:
+    def _split_cities(
+        self, cities: List[VRPInstance], v: int
+    ) -> List[List[VRPInstance]]:
         """
         Split the list of cities into v chunks of nearly equal size.
 
@@ -54,7 +59,9 @@ class GRASPVRP(VRPInstanceLoader):
             start += size
         return chunks
 
-    def _construct_route(self, chunk: List[VRPInstance], depot: VRPInstance, rcl_size: int) -> List[VRPInstance]:
+    def _construct_route(
+        self, chunk: List[VRPInstance], depot: VRPInstance, rcl_size: int
+    ) -> List[VRPInstance]:
         """
         Build a single route: depot -> cities in chunk -> depot,
         always choosing randomly from the RCL of nearest neighbors.

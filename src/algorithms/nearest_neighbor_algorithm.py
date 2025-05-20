@@ -4,7 +4,8 @@ import time
 from copy import deepcopy
 from typing import List
 
-from src.algorithms.tools.vrp_tools import VehicleInfo, VRPInstance, VRPInstanceLoader
+from src.algorithms.tools.vrp_tools import (VehicleInfo, VRPInstance,
+                                            VRPInstanceLoader)
 from src.utils.logger_config import logger
 
 

@@ -1,7 +1,7 @@
 import json
 import os
 from math import sqrt
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,12 +9,9 @@ import pandas as pd
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 
-from src.utils.constants import (
-    CLARKE_WRIGHT_SAVINGS_NAME,
-    GENETIC_ALGORITHM_NAME,
-    GRASP_ALGORITHM_NAME,
-    NN_ALGORITHM_NAME,
-)
+from src.utils.constants import (CLARKE_WRIGHT_SAVINGS_NAME,
+                                 GENETIC_ALGORITHM_NAME, GRASP_ALGORITHM_NAME,
+                                 NN_ALGORITHM_NAME)
 from src.utils.logger_config import logger
 
 _BASE_PATH = os.path.join("..", "..", "results")

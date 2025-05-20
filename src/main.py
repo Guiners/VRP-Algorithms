@@ -3,26 +3,23 @@ import os
 import re
 from typing import Callable
 
-from src.algorithms.clarke_wright_savings_algorithm import ClarkeWrightSavingsVRP
+from src.algorithms.clarke_wright_savings_algorithm import \
+    ClarkeWrightSavingsVRP
 from src.algorithms.genetic_algorithm import GeneticAlgorithmVRP
 from src.algorithms.grasp_algorithm import GRASPVRP
 from src.algorithms.nearest_neighbor_algorithm import NearestNeighborVRP
 from src.algorithms.tools.vrp_tools import VehicleInfo
-from src.utils.constants import (
-    ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
-    ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
-    ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
-    ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH,
-    ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH,
-    CLARKE_WRIGHT_SAVINGS_NAME,
-    GENETIC_ALGORITHM_NAME,
-    GRASP_ALGORITHM_NAME,
-    JSON,
-    NN_ALGORITHM_NAME,
-)
+from src.utils.constants import (ABSOLUTE_INPUT_LARGE_FOLDER_PATH,
+                                 ABSOLUTE_INPUT_MEDIUM_FOLDER_PATH,
+                                 ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
+                                 ABSOLUTE_INPUT_XLARGE_FOLDER_PATH,
+                                 ABSOLUTE_OUTPUT_LARGE_FOLDER_PATH,
+                                 ABSOLUTE_OUTPUT_MEDIUM_FOLDER_PATH,
+                                 ABSOLUTE_OUTPUT_SMALL_FOLDER_PATH,
+                                 ABSOLUTE_OUTPUT_XLARGE_FOLDER_PATH,
+                                 CLARKE_WRIGHT_SAVINGS_NAME,
+                                 GENETIC_ALGORITHM_NAME, GRASP_ALGORITHM_NAME,
+                                 JSON, NN_ALGORITHM_NAME)
 from src.utils.logger_config import logger
 
 _PATTERN: str = r"^[^.]+"
