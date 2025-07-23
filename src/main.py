@@ -201,7 +201,7 @@ def run_nn_for_xlarge() -> None:
 
 
 def run_nn_for_small() -> None:
-    """Run Nearest Neighbor algorithm for small dataset."""
+    """Run Nearest Neighbor algorithm for small dataset"""
     nn_algorithm = NearestNeighborVRP(vehicle_info)
     iterate_files(
         ABSOLUTE_INPUT_SMALL_FOLDER_PATH,
